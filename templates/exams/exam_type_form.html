@@ -1,0 +1,38 @@
+
+{% extends "exams/exams_base.html" %}
+{% block exam_title %}Add Exam Type{% endblock %}
+{% block nav_type_create %}active{% endblock %}
+
+{% block exam_content %}
+<div class="exm-page-header">
+    <div class="exm-pg-label">Exam Types</div>
+    <h1 class="exm-page-title">Add Exam Type</h1>
+    <div class="exm-page-sub">Define a category — e.g. Mid-term, End-term, CAT.</div>
+</div>
+
+<div class="exm-card" style="max-width:580px;">
+    <div class="exm-card-head">
+        <span class="exm-card-icon"><i class="fas fa-tag"></i></span>
+        <h6>Type Details</h6>
+    </div>
+    <div class="exm-card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            <div class="exm-field">
+                <label class="exm-lbl" for="{{ form.name.id_for_label }}">Name <span class="req">*</span></label>
+                <input type="text" name="{{ form.name.html_name }}" id="{{ form.name.id_for_label }}" value="{{ form.name.value|default:'' }}" placeholder="e.g. Mid-term, End-term, CAT, Mock" class="exm-input {% if form.name.errors %}has-error{% endif %}" autocomplete="off">
+                {% for err in form.name.errors %}<div class="exm-field-error"><i class="fas fa-exclamation-circle"></i> {{ err }}</div>{% endfor %}
+            </div>
+            <div class="exm-field">
+                <label class="exm-lbl" for="{{ form.description.id_for_label }}">Description</label>
+                <textarea name="{{ form.description.html_name }}" id="{{ form.description.id_for_label }}" placeholder="Optional description…" class="exm-textarea {% if form.description.errors %}has-error{% endif %}">{{ form.description.value|default:'' }}</textarea>
+                {% for err in form.description.errors %}<div class="exm-field-error"><i class="fas fa-exclamation-circle"></i> {{ err }}</div>{% endfor %}
+            </div>
+            <div class="exm-actions">
+                <button type="submit" class="exm-btn exm-btn-primary"><i class="fas fa-save"></i> Save Type</button>
+                <a href="{% url 'exams:exam_types_list' %}" class="exm-btn exm-btn-ghost"><i class="fas fa-times"></i> Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+
+{% block content %}
+<h2 class="mb-4">Inbox</h2>
+
+<a href="{% url 'send_message' %}" class="btn btn-primary mb-3">+ New Message</a>
+
+<div class="card p-3 shadow-sm">
+    {% if messages %}
+    <ul class="list-group">
+        {% for msg in messages %}
+        <li class="list-group-item {% if not msg.is_read %}fw-bold{% endif %}">
+            <h5>{{ msg.subject }}</h5>
+            <p>{{ msg.body|truncatewords:20 }}</p>
+
+            <small class="text-muted">From: {{ msg.sender }} | {{ msg.created_at|date:"M d, Y H:i" }}</small>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No messages yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

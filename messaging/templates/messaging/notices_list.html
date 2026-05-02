@@ -1,0 +1,26 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+
+{% block content %}
+<h2 class="mb-4">School Notices</h2>
+
+<a href="{% url 'notice_create' %}" class="btn btn-primary mb-3">+ Add Notice</a>
+
+<div class="card p-3 shadow-sm">
+    {% if notices %}
+    <ul class="list-group">
+        {% for n in notices %}
+        <li class="list-group-item">
+            <h5>{{ n.title }}</h5>
+            <p>{{ n.message|truncatewords:25 }}</p>
+
+            <span class="badge bg-info">{{ n.get_notice_type_display }}</span>
+            <br><small class="text-muted">{{ n.created_at|date:"M d, Y H:i" }}</small>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No notices available.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Library Fines{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Library Fines</h2>
+
+    {% if fines %}
+    <table class="table table-striped table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Book</th>
+                <th>Amount</th>
+                <th>Date Issued</th>
+                <th>Paid</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in fines %}
+            <tr>
+                <td>{{ f.student }}</td>
+                <td>{{ f.book.title }}</td>
+                <td>KES {{ f.amount }}</td>
+                <td>{{ f.created_at|date:"d M Y" }}</td>
+                <td>
+                    {% if f.is_paid %}
+                    <span class="badge bg-success">Paid</span>
+                    {% else %}
+                    <span class="badge bg-danger">Not Paid</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not f.is_paid %}
+                    <a href="{% url 'library:fine_pay' f.id %}" class="btn btn-sm btn-primary">Mark as Paid</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="alert alert-info mt-3">No fines recorded.</p>
+    {% endif %}
+</div>
+{% endblock %}

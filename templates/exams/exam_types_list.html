@@ -1,0 +1,50 @@
+
+{% extends "exams/exams_base.html" %}
+{% block exam_title %}Exam Types{% endblock %}
+{% block nav_types %}active{% endblock %}
+
+{% block exam_content %}
+<div class="exm-page-header">
+    <div class="exm-page-header-row">
+        <div>
+            <div class="exm-pg-label">Exam Management</div>
+            <h1 class="exm-page-title">Exam Types</h1>
+            <div class="exm-page-sub">Categories used when creating exams.</div>
+        </div>
+        <a href="{% url 'exams:exam_type_create' %}" class="exm-btn exm-btn-primary">
+            <i class="fas fa-plus"></i> Add Type
+        </a>
+    </div>
+</div>
+
+<div class="exm-card">
+    <div class="exm-card-head">
+        <span class="exm-card-icon"><i class="fas fa-tags"></i></span>
+        <h6>All Exam Types</h6>
+        <small>{{ exam_types.count }} type{{ exam_types.count|pluralize }}</small>
+    </div>
+    {% if exam_types %}
+    <div style="overflow-x:auto;">
+    <table class="exm-table">
+        <thead><tr><th>#</th><th>Name</th><th>Description</th><th>Action</th></tr></thead>
+        <tbody>
+            {% for et in exam_types %}
+            <tr>
+                <td style="color:#334155;">{{ forloop.counter }}</td>
+                <td class="td-name">{{ et.name }}</td>
+                <td>{{ et.description|default:"—"|truncatechars:70 }}</td>
+                <td>
+                    <a href="{% url 'exams:exam_types_form' et.id %}" class="exm-btn exm-btn-ghost exm-btn-sm">
+                        <i class="fas fa-pen"></i> Edit
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="exm-empty"><i class="fas fa-tags"></i><p>No exam types yet. Add one using the button above.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

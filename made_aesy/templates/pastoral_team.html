@@ -1,0 +1,35 @@
+{% extends 'church_base.html' %}
+{% load static %}
+{% block title %}Pastoral Team — ACK Church{% endblock %}
+{% block extra_head %}
+<style>
+    .profile {
+        background: linear-gradient(90deg, #fff9f2, #fff3e8);
+        padding: 18px;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .profile img {
+        width: 140px;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<h2>Our Pastoral Team</h2>
+<div class="row g-4">
+    {% for pastor in pastors %}
+    <div class="col-md-3">
+        <div class="profile">
+            <img src="{{ pastor.photo.url }}" alt="{{ pastor.name }}">
+            <h5 class="mt-2">{{ pastor.name }}</h5>
+            <p class="small text-muted">{{ pastor.role }}</p>
+            <p class="small">{{ pastor.short_bio|truncatechars:120 }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

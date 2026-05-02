@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile — {{ request.user.get_full_name }}{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body, body.light-mode, body.dark-mode {
+    background-color: #080f1c !important;
+    color: #e2e8f0 !important;
+}
+main.container {
+    padding-top: 0 !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+.tp-subnav {
+    background: rgba(10,20,38,.98);
+    border-bottom: 1px solid rgba(56,189,248,.1);
+    backdrop-filter: blur(16px);
+    display: flex; align-items: center;
+    height: 52px; padding: 0 1.6rem; gap: .8rem;
+    position: sticky; top: 60px; z-index: 900;
+}
+.tp-back {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .76rem; font-weight: 600; color: #64748b;
+    text-decoration: none !important;
+    padding: .32rem .75rem; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.07); transition: all .15s;
+    font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap;
+}
+.tp-back:hover { background: rgba(56,189,248,.08); color: #38bdf8; border-color: rgba(56,189,248,.2); }
+.tp-back i { font-size: .7rem; }
+.tp-nav-title {
+    font-size: .7rem; font-weight: 700; letter-spacing: 2.5px;
+    text-transform: uppercase; color: #38bdf8; flex: 1;
+}
+.tp-breadcrumb { font-size: .73rem; color: #334155; display: flex; align-items: center; gap: .4rem; }
+.tp-breadcrumb a { color: #475569; text-decoration: none; }
+.tp-breadcrumb a:hover { color: #38bdf8; }
+.tp-breadcrumb i { font-size: .55rem; color: #1e293b; }
+
+#tp-page {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #e2e8f0; padding: 2rem 1.8rem 5rem;
+    max-width: 980px; margin: 0 auto;
+    animation: tpFadeUp .4s ease both;
+}
+@keyframes tpFadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+#tp-page .tp-header {
+    margin-bottom: 2rem; padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(56,189,248,.1);
+    display: flex; align-items: center; gap: 1.4rem; flex-wrap: wrap;
+}
+#tp-page .tp-avatar {
+    width: 68px; height: 68px; border-radius: 50%;
+    background: linear-gradient(135deg, #0369a1, #38bdf8);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    box-shadow: 0 6px 20px rgba(14,165,233,.4);
+}
+#tp-page .tp-pg-label {
+    font-size: .68rem; font-weight: 700; letter-spacing: 2.8px;
+    text-transform: uppercase; color: #38bdf8; margin-bottom: .3rem;
+    display: flex; align-items: center; gap: .4rem;
+}
+#tp-page .tp-pg-label::before {
+    content: ''; width: 14px; height: 2px; background: #38bdf8; border-radius: 2px;
+}
+#tp-page .tp-header-info h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.85rem; font-weight: 700; color: #f0f9ff;
+    margin: 0 0 .4rem; line-height: 1.15;
+}
+#tp-page .tp-header-sub {
+    font-size: .8rem; color: #475569; display: flex; align-items: center; gap: .6rem;
+}
+#tp-page .tp-header-sub span { color: #64748b; }
+#tp-page .tp-role-pill {
+    display: inline-flex; align-items: center; gap: .35rem;
+    background: rgba(56,189,248,.1); border: 1px solid rgba(56,189,248,.2);
+    color: #38bdf8; border-radius: 20px; padding: .2rem .7rem;
+    font-size: .68rem; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+}
+#tp-page .tp-role-pill-gold {
+    background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.25); color: #fcd34d;
+}
+#tp-page .tp-alert {
+    border-radius: 12px; padding: .9rem 1.2rem; font-size: .85rem; font-weight: 500;
+    margin-bottom: 1.5rem; display: flex; align-items: center; gap: .7rem; border: 1px solid;
+}
+#tp-page .tp-alert-success { background: rgba(52,211,153,.08); border-color: rgba(52,211,153,.2); color: #6ee7b7; }
+#tp-page .tp-alert-error   { background: rgba(239,68,68,.08);  border-color: rgba(239,68,68,.2);  color: #fca5a5; }
+#tp-page .tp-alert i { font-size: .9rem; flex-shrink: 0; }
+
+#tp-page .tp-card {
+    background: #0d1b2e; border: 1px solid rgba(255,255,255,.07);
+    border-radius: 18px; overflow: hidden; margin-bottom: 1.4rem;
+}
+#tp-page .tp-card-head {
+    padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,.06);
+    background: rgba(56,189,248,.04); display: flex; align-items: center; gap: .7rem;
+}
+#tp-page .tp-card-head .tc-icon {
+    width: 30px; height: 30px; background: rgba(56,189,248,.1);
+    border: 1px solid rgba(56,189,248,.2); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; color: #38bdf8; flex-shrink: 0;
+}
+#tp-page .tp-card-head h6 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; font-weight: 700; color: #f1f5f9; margin: 0;
+}
+#tp-page .tp-card-body { padding: 1.6rem 1.5rem; }
+
+#tp-page .tp-field { margin-bottom: 1.3rem; }
+#tp-page .tp-field:last-child { margin-bottom: 0; }
+#tp-page .tp-lbl {
+    display: block; font-size: .74rem; font-weight: 600; color: #64748b;
+    letter-spacing: .5px; text-transform: uppercase; margin-bottom: .5rem;
+}
+#tp-page .tp-input {
+    width: 100%; background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+    padding: .7rem 1rem; font-size: .88rem;
+    font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0;
+    transition: border-color .2s, box-shadow .2s; outline: none; -webkit-appearance: none;
+}
+#tp-page .tp-input:focus {
+    border-color: rgba(56,189,248,.45); background: rgba(56,189,248,.04);
+    box-shadow: 0 0 0 3px rgba(56,189,248,.1);
+}
+#tp-page .tp-input::placeholder { color: #334155; }
+#tp-page .tp-input.has-error { border-color: rgba(239,68,68,.4) !important; }
+
+#tp-page .tp-check-wrap {
+    display: flex; align-items: center; gap: .75rem;
+    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px; padding: .75rem 1rem; cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+#tp-page .tp-check-wrap:hover { border-color: rgba(56,189,248,.25); background: rgba(56,189,248,.04); }
+#tp-page .tp-check-wrap input[type="checkbox"] { width: 18px; height: 18px; accent-color: #38bdf8; cursor: pointer; flex-shrink: 0; }
+#tp-page .tp-check-lbl { font-size: .85rem; font-weight: 500; color: #94a3b8; cursor: pointer; line-height: 1.4; }
+#tp-page .tp-check-lbl span { display: block; font-size: .73rem; color: #334155; margin-top: .1rem; }
+
+#tp-page .tp-subjects-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .6rem;
+}
+#tp-page .tp-subj-check {
+    display: flex; align-items: center; gap: .6rem;
+    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
+    border-radius: 9px; padding: .6rem .9rem; cursor: pointer;
+    transition: all .15s; font-size: .82rem; color: #64748b;
+}
+#tp-page .tp-subj-check:hover { background: rgba(56,189,248,.06); border-color: rgba(56,189,248,.2); color: #94a3b8; }
+#tp-page .tp-subj-check input[type="checkbox"] { accent-color: #38bdf8; width: 15px; height: 15px; flex-shrink: 0; }
+
+#tp-page .tp-info-row {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .7rem 0; border-bottom: 1px solid rgba(255,255,255,.05); font-size: .84rem;
+}
+#tp-page .tp-info-row:last-child { border-bottom: none; }
+#tp-page .tp-info-row i { color: #38bdf8; font-size: .8rem; width: 16px; text-align: center; flex-shrink: 0; }
+#tp-page .tp-info-key { color: #475569; font-weight: 600; min-width: 100px; }
+#tp-page .tp-info-val { color: #cbd5e1; }
+
+#tp-page .tp-field-error { font-size: .74rem; color: #fca5a5; margin-top: .35rem; display: flex; align-items: center; gap: .35rem; }
+#tp-page .tp-field-error i { font-size: .7rem; }
+
+#tp-page .tp-actions { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; padding-top: .5rem; }
+#tp-page .tp-btn {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .82rem; font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif;
+    border-radius: 10px; padding: .55rem 1.3rem; cursor: pointer; border: 1px solid;
+    transition: all .2s; text-decoration: none !important; letter-spacing: .15px;
+}
+#tp-page .tp-btn-primary {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8); border-color: transparent;
+    color: #fff; box-shadow: 0 4px 14px rgba(14,165,233,.3);
+}
+#tp-page .tp-btn-primary:hover {
+    background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff;
+    box-shadow: 0 6px 22px rgba(14,165,233,.4); transform: translateY(-1px);
+}
+#tp-page .tp-btn-ghost { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); color: #64748b; }
+#tp-page .tp-btn-ghost:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); color: #e2e8f0; }
+#tp-page .tp-hint { font-size: .75rem; color: #334155; margin-left: auto; display: flex; align-items: center; gap: .35rem; }
+#tp-page .tp-hint i { color: #1e3a5f; font-size: .72rem; }
+
+@media (max-width: 768px) {
+    .tp-subnav { padding: 0 .9rem; }
+    .tp-breadcrumb { display: none; }
+    #tp-page { padding: 1.4rem 1rem 4rem; }
+    #tp-page .tp-header { gap: 1rem; }
+    #tp-page .tp-avatar { width: 54px; height: 54px; font-size: 1.3rem; }
+    #tp-page .tp-header-info h2 { font-size: 1.45rem; }
+    #tp-page .tp-subjects-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+    #tp-page .tp-subjects-grid { grid-template-columns: 1fr; }
+    #tp-page .tp-actions { flex-direction: column; align-items: stretch; }
+    #tp-page .tp-btn { justify-content: center; }
+    #tp-page .tp-hint { margin-left: 0; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<nav class="tp-subnav">
+    <a href="{% url 'teachers:dashboard' %}" class="tp-back">
+        <i class="fas fa-arrow-left"></i> Dashboard
+    </a>
+    <div class="tp-nav-title">Profile Settings</div>
+    <div class="tp-breadcrumb">
+        <a href="{% url 'teachers:dashboard' %}">Dashboard</a>
+        <i class="fas fa-chevron-right"></i>
+        <span style="color:#64748b;">Edit Profile</span>
+    </div>
+</nav>
+
+<div id="tp-page">
+
+    <div class="tp-header">
+        <div class="tp-avatar">
+            {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+        </div>
+        <div class="tp-header-info">
+            <div class="tp-pg-label">Profile Settings</div>
+            <h2>{{ request.user.get_full_name|default:request.user.username }}</h2>
+            <div class="tp-header-sub">
+                <span>{{ request.user.email|default:"No email set" }}</span>
+                &nbsp;·&nbsp;
+                {% if profile.is_class_teacher %}
+                    <span class="tp-role-pill tp-role-pill-gold"><i class="fas fa-star"></i> Class Teacher</span>
+                {% else %}
+                    <span class="tp-role-pill"><i class="fas fa-chalkboard-teacher"></i> Subject Teacher</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            {% if 'error' in message.tags %}
+                <div class="tp-alert tp-alert-error"><i class="fas fa-exclamation-circle"></i> {{ message }}</div>
+            {% else %}
+                <div class="tp-alert tp-alert-success"><i class="fas fa-check-circle"></i> {{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="tp-card">
+            <div class="tp-card-head">
+                <span class="tc-icon"><i class="fas fa-id-card"></i></span>
+                <h6>Account Information</h6>
+                <small style="margin-left:auto;font-size:.72rem;color:#334155;">
+                    <i class="fas fa-lock me-1" style="font-size:.65rem;"></i>Read-only
+                </small>
+            </div>
+            <div class="tp-card-body">
+                <div class="tp-info-row">
+                    <i class="fas fa-user"></i>
+                    <span class="tp-info-key">Full Name</span>
+                    <span class="tp-info-val">{{ request.user.get_full_name|default:"—" }}</span>
+                </div>
+                <div class="tp-info-row">
+                    <i class="fas fa-envelope"></i>
+                    <span class="tp-info-key">Email</span>
+                    <span class="tp-info-val">{{ request.user.email|default:"—" }}</span>
+                </div>
+                <div class="tp-info-row">
+                    <i class="fas fa-id-badge"></i>
+                    <span class="tp-info-key">Employee No</span>
+                    <span class="tp-info-val">{{ profile.employee_number }}</span>
+                </div>
+                <div class="tp-info-row">
+                    <i class="fas fa-school"></i>
+                    <span class="tp-info-key">School</span>
+                    <span class="tp-info-val">{{ profile.school.name }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tp-card">
+            <div class="tp-card-head">
+                <span class="tc-icon"><i class="fas fa-pen"></i></span>
+                <h6>Edit Details</h6>
+            </div>
+            <div class="tp-card-body">
+
+                <div class="tp-field">
+                    <label class="tp-lbl" for="{{ form.department.id_for_label }}">Department</label>
+                    <input
+                        type="text"
+                        name="{{ form.department.html_name }}"
+                        id="{{ form.department.id_for_label }}"
+                        value="{{ form.department.value|default:'' }}"
+                        placeholder="e.g. Mathematics, Sciences, Languages…"
+                        class="tp-input {% if form.department.errors %}has-error{% endif %}"
+                        autocomplete="off"
+                    >
+                    {% for err in form.department.errors %}
+                        <div class="tp-field-error"><i class="fas fa-exclamation-circle"></i> {{ err }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="tp-field">
+                    <label class="tp-lbl">Role</label>
+                    <label class="tp-check-wrap" for="{{ form.is_class_teacher.id_for_label }}">
+                        <input
+                            type="checkbox"
+                            name="{{ form.is_class_teacher.html_name }}"
+                            id="{{ form.is_class_teacher.id_for_label }}"
+                            {% if form.is_class_teacher.value %}checked{% endif %}
+                        >
+                        <div class="tp-check-lbl">
+                            I am a Class Teacher
+                            <span>Check this if you are assigned as a class teacher in addition to teaching subjects.</span>
+                        </div>
+                    </label>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tp-card">
+            <div class="tp-card-head">
+                <span class="tc-icon"><i class="fas fa-book-open"></i></span>
+                <h6>Assigned Subjects</h6>
+                <small style="margin-left:auto;font-size:.72rem;color:#334155;">Select all subjects you teach</small>
+            </div>
+            <div class="tp-card-body">
+                {% if form.subjects.field.queryset.exists %}
+                    <div class="tp-subjects-grid">
+                        {% for choice_id, choice_label in form.subjects.field.choices %}
+                            <label class="tp-subj-check">
+                                <input type="checkbox" name="{{ form.subjects.html_name }}" value="{{ choice_id }}" {% if choice_id in form.subjects.value %}checked{% endif %}>
+                                <span>{{ choice_label }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="font-size:.84rem;color:#334155;margin:0;">
+                        <i class="fas fa-info-circle me-1" style="color:#1e3a5f;"></i>
+                        No subjects available yet. Ask your admin to add subjects first.
+                    </p>
+                {% endif %}
+                {% for err in form.subjects.errors %}
+                    <div class="tp-field-error mt-2"><i class="fas fa-exclamation-circle"></i> {{ err }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="tp-actions">
+            <button type="submit" class="tp-btn tp-btn-primary">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <a href="{% url 'teachers:dashboard' %}" class="tp-btn tp-btn-ghost">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+            <div class="tp-hint">
+                <i class="fas fa-shield-alt"></i>
+                Changes are saved immediately and securely.
+            </div>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}

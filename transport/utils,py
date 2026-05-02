@@ -1,0 +1,23 @@
+def get_user_schools(user):
+    """
+    Returns a queryset of schools the user can access
+    """
+
+    if user.is_superuser:
+        return None  # None means ALL schools
+
+    if hasattr(user, "adminprofile"):
+        return user.adminprofile.schools.all()
+
+    if hasattr(user, "payrollprofile"):
+        return user.payrollprofile.school.all()
+
+    if hasattr(user, "teacherprofile"):
+        return user.teacherprofile.schools.all()
+
+    if hasattr(user, "parentprofile"):
+        return user.parentprofile.children.values_list(
+            "school", flat=True
+        ).distinct()
+
+    return []

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Exam Results</h2>
+
+    <a href="{% url 'results_add' %}" class="btn btn-primary mb-3">+ Add Exam Result</a>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Exam</th>
+                <th>Score</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for r in results %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ r.student }}</td>
+                <td>{{ r.exam }}</td>
+                <td>{{ r.score }}</td>
+                <td>{{ r.grade }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No results found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

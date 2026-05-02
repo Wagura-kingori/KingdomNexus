@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Fee Payments</h2>
+
+<a href="{% url 'fee_payment_create' %}" class="btn btn-primary mb-3">+ Record Payment</a>
+
+<table class="table table-striped">
+    <tr>
+        <th>Student</th>
+        <th>Amount</th>
+        <th>Payment Date</th>
+        <th>Payment Method</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for pay in payment_list %}
+    <tr>
+        <td>{{ pay.student.user.full_name }}</td>
+        <td>KES {{ pay.amount }}</td>
+        <td>{{ pay.date }}</td>
+        <td>{{ pay.method }}</td>
+        <td>
+            <a href="{% url 'fee_payment_edit' pay.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'fee_payment_delete' pay.id %}" class="btn btn-sm btn-danger">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

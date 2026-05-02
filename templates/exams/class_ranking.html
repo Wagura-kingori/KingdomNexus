@@ -1,0 +1,48 @@
+
+{% extends "exams/exams_base.html" %}
+{% block exam_title %}Ranking — {{ exam.name }}{% endblock %}
+{% block nav_exams %}active{% endblock %}
+
+{% block exam_content %}
+<div class="exm-page-header">
+    <div class="exm-page-header-row">
+        <div>
+            <div class="exm-pg-label">Class Ranking</div>
+            <h1 class="exm-page-title">{{ exam.name }}</h1>
+            <div class="exm-page-sub">{{ exam.term }} {{ exam.year }} &nbsp;·&nbsp; {{ ranking.count }} student{{ ranking.count|pluralize }} ranked</div>
+        </div>
+        <a href="{% url 'exams:exams_list' %}" class="exm-btn exm-btn-ghost"><i class="fas fa-arrow-left"></i> Back to Exams</a>
+    </div>
+</div>
+
+<div class="exm-card">
+    <div class="exm-card-head">
+        <span class="exm-card-icon"><i class="fas fa-trophy"></i></span>
+        <h6>Rankings</h6>
+    </div>
+    {% if ranking %}
+    <div style="overflow-x:auto;">
+    <table class="exm-table">
+        <thead><tr><th>Rank</th><th>Student</th><th>Score</th><th>Grade</th><th>Remark</th></tr></thead>
+        <tbody>
+            {% for r in ranking %}
+            <tr>
+                <td>
+                    <span style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;{% if r.position == 1 %}color:#fbbf24;{% elif r.position == 2 %}color:#94a3b8;{% elif r.position == 3 %}color:#b45309;{% else %}color:#334155;{% endif %}">
+                        {% if r.position == 1 %}🥇{% elif r.position == 2 %}🥈{% elif r.position == 3 %}🥉{% else %}#{{ r.position }}{% endif %}
+                    </span>
+                </td>
+                <td class="td-name">{{ r.student.first_name }} {{ r.student.last_name }}</td>
+                <td><span class="score {% if r.score >= 70 %}score-high{% elif r.score >= 50 %}score-mid{% else %}score-low{% endif %}">{{ r.score }}</span></td>
+                <td>{% if r.grade %}<span class="grade-badge grade-{{ r.grade|lower }}">{{ r.grade }}</span>{% else %}<span style="color:#334155;">—</span>{% endif %}</td>
+                <td style="font-size:.78rem;color:#64748b;">{{ r.remark|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="exm-empty"><i class="fas fa-trophy"></i><p>No results recorded for this exam yet.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Library Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Library Dashboard</h2>
+
+    <div class="row">
+
+        <!-- Stats Cards -->
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm p-3">
+                <h5>Total Books</h5>
+                <h2>{{ total_books }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm p-3">
+                <h5>Available</h5>
+                <h2>{{ available_books }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm p-3">
+                <h5>Borrowed</h5>
+                <h2>{{ borrowed_books }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm p-3">
+                <h5>Overdue</h5>
+                <h2 class="text-danger">{{ overdue_count }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-5">
+        <h4>Quick Actions</h4>
+        <a href="{% url 'library:book_add' %}" class="btn btn-primary me-2">Add Book</a>
+        <a href="{% url 'library:borrow_add' %}" class="btn btn-success me-2">Record Borrow</a>
+        <a href="{% url 'library:categories_list' %}" class="btn btn-secondary">Manage Categories</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Fee Structure</h2>
+
+<a href="{% url 'fee_structure_create' %}" class="btn btn-primary mb-3">+ Add Fee Structure</a>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Class</th>
+        <th>Term</th>
+        <th>Amount</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for fee in fee_list %}
+    <tr>
+        <td>{{ fee.class_name.name }}</td>
+        <td>{{ fee.term }}</td>
+        <td>KES {{ fee.amount }}</td>
+        <td>
+            <a href="{% url 'fee_structure_edit' fee.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'fee_structure_delete' fee.id %}" class="btn btn-sm btn-danger">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

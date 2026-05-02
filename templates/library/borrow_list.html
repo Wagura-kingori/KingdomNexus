@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Borrowed Books{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Borrowed Books</h2>
+
+    <a href="{% url 'library:borrow_add' %}" class="btn btn-primary mb-3">Record Borrow</a>
+
+    {% if borrows %}
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Book</th>
+                <th>Date Borrowed</th>
+                <th>Due Date</th>
+                <th>Date Returned</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in borrows %}
+            <tr>
+                <td>{{ b.student }}</td>
+                <td>{{ b.book.title }}</td>
+                <td>{{ b.date_borrowed|date:"d M Y" }}</td>
+                <td>{{ b.due_date|date:"d M Y" }}</td>
+                <td>
+                    {% if b.date_returned %}
+                    {{ b.date_returned|date:"d M Y" }}
+                    {% else %}
+                    <span class="text-danger">Not returned</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if b.is_overdue %}
+                    <span class="badge bg-danger">Overdue</span>
+                    {% else %}
+                    <span class="badge bg-success">OK</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'library:borrow_edit' b.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'library:borrow_delete' b.id %}" class="btn btn-sm btn-danger"
+                        onclick="return confirm('Delete this entry?');">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="alert alert-info">No borrow records found.</p>
+    {% endif %}
+</div>
+{% endblock %}

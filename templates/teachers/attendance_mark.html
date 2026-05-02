@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+
+    <h3>Mark Attendance — {{ classroom.name }}</h3>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Present?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ s.full_name }}</td>
+                    <td>
+                        <input type="checkbox" name="present_{{ s.id }}" checked>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success">Save Attendance</button>
+    </form>
+
+</div>
+{% endblock %}

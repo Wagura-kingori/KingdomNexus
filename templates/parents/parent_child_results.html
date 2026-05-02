@@ -1,0 +1,32 @@
+{% extends 'dashboard_base.html' %}
+{% block content %}
+<h2>Results – {{ child.first_name }} {{ child.last_name }}</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Exam</th>
+            <th>Subject</th>
+            <th>Score</th>
+            <th>Grade</th>
+            <th>Remark</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in results %}
+        <tr>
+            <td>{{ r.exam.name }}</td>
+            <td>{{ r.subject }}</td>
+            <td>{{ r.score }}</td>
+            <td>{{ r.grade }}</td>
+            <td>{{ r.remark }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center">No results yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

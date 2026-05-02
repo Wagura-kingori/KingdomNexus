@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Employees</h2>
+    <a href="{% url 'payroll:employee_add' %}" class="btn btn-primary mb-3">Add Employee</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Staff ID</th>
+                <th>Job</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in employees %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ e.name }}</td>
+                <td>{{ e.staff_id }}</td>
+                <td>{{ e.job_title }}</td>
+                <td><a href="{% url 'payroll:employee_edit' e.id %}" class="btn btn-sm btn-warning">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

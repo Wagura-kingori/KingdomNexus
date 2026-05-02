@@ -1,0 +1,336 @@
+{% load group_tags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}ACK Church{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            padding-top: 60px;
+            transition: background-color .4s, color .4s;
+        }
+
+        body.light-mode {
+            background-color: #ffffff;
+            color: #000;
+        }
+
+        body.dark-mode {
+            background-color: #1e1e1e;
+            color: #fff;
+        }
+
+        .navbar-brand img {
+            height: 48px;
+            width: auto;
+        }
+
+        .mode-toggle-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* ✨ LOGIN MODAL STYLE ✨ */
+        .login-modal-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            animation: modalShow .35s ease-out;
+            position: relative;
+            overflow: visible;
+        }
+
+        @keyframes modalShow {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-align: center;
+            color: #333;
+        }
+
+        .login-btn {
+            padding: 10px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4f46e5, #3b82f6);
+            border: none;
+            color: #fff;
+            font-size: 1.1rem;
+            transition: .3s;
+        }
+
+        .login-btn:hover {
+            opacity: .92;
+        }
+
+        /* Centered modal alerts */
+        #modal-alert {
+            z-index: 2000;
+        }
+
+        #modal-alert .alert {
+            font-size: 1rem;
+            border-radius: 10px;
+        }
+
+        /* small responsive tweak */
+        @media (max-width: 380px) {
+            #modal-alert {
+                width: 90% !important;
+                left: 5% !important;
+                transform: none !important;
+                top: 30% !important;
+            }
+        }
+
+        .modal-backdrop.show {
+            backdrop-filter: blur(3px);
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="light-mode">
+
+    <!-- NAVIGATION -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="/static/images/church_logo.jpg" alt="ACK Logo">
+                <span class="ms-2">ACK Church</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/projects/' in request.path %}active{% endif %}"
+                            href="/projects/">Projects</a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if '/ministries/' in request.path %}active{% endif %}"
+                            href="#" data-bs-toggle="dropdown">Ministries</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/ministries/men/">Men Fellowship</a></li>
+                            <li><a class="dropdown-item" href="/ministries/women/">Mothers Union</a></li>
+                            <li><a class="dropdown-item" href="/ministries/youth/">Youth Ministry</a></li>
+                            <li><a class="dropdown-item" href="/ministries/children/">Children Ministry</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/gallery/' in request.path %}active{% endif %}"
+                            href="/gallery/">Gallery</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/sermons/' in request.path %}active{% endif %}"
+                            href="/sermons/">Sermons</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/schools/' in request.path %}active{% endif %}"
+                            href="/schools/">Schools</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/donate/' in request.path %}active{% endif %}"
+                            href="/donate/">Donate</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/contact/' in request.path %}active{% endif %}"
+                            href="/contact/">Contact</a>
+                    </li>
+
+                    <!-- SCHOOL APPS -->
+                    <li class="nav-item dropdown">
+
+                        {% if user.is_authenticated %}
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">School Apps</a>
+
+                        <ul class="dropdown-menu">
+                            {% if user.is_superuser or user|has_group:"Admins" %}
+                            <li><a class="dropdown-item" href="/admin_dashboard/">Admin Dashboard</a></li>
+                            {% endif %}
+
+                            {% if user|has_group:"Teacher" %}
+                            <li><a class="dropdown-item" href="/students/">Students</a></li>
+                            <li><a class="dropdown-item" href="/academics/">Academics</a></li>
+                            <li><a class="dropdown-item" href="/exams/">Exams / Marks</a></li>
+                            {% endif %}
+
+                            {% if user|has_group:"PayrollManager" or user.is_superuser %}
+                            <li><a class="dropdown-item" href="/payroll/">Payroll</a></li>
+                            {% endif %}
+                        </ul>
+
+                        {% else %}
+                        <a class="nav-link" href="#" onclick="showSchoolLogin()">School Apps</a>
+                        {% endif %}
+                    </li>
+                </ul>
+
+                <!--  Theme -->
+                <button id="themeBtn" class="mode-toggle-btn ms-3">🌙</button>
+
+                <!--  LOGIN / LOGOUT BUTTON -->
+                {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'logout' %}" class="ms-3 d-inline">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">Logout</button>
+                </form>
+                {% else %}
+                <button class="btn btn-outline-light ms-3" onclick="showSchoolLogin()">Login</button>
+                {% endif %}
+
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!--  LOGIN MODAL  -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content login-modal-card position-relative">
+
+                {% if messages %}
+                <div id="modal-alert" class="position-absolute top-50 start-50 translate-middle w-75 text-center"
+                    role="alert" aria-live="polite">
+                    {% for message in messages %}
+                    <div class="alert 
+                        {% if 'error' in message.tags %}alert-danger{% elif 'success' in message.tags %}alert-success{% else %}alert-info{% endif %}
+                        fw-bold py-2 shadow">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <h5 id="login-message" class="text-center text-danger mb-3" style="display: none;">
+                    In order to continue, please first login.
+                </h5>
+
+                <h5 class="login-title mb-3 mt-1">School System Login</h5>
+
+                <form method="POST" action="{% url 'users:login' %}" class="mb-1" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" autocomplete="username" placeholder="username">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" autocomplete="current-password" placeholder="password">
+                    </div>
+
+                    <button type="submit" class="login-btn w-100 mt-2">Login</button>
+                </form>
+
+                <button type="button" class="btn-close position-absolute end-0 mt-2 me-2" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <p>&copy; {% now "Y" %} ACK Church — Rooted in Christ, Serving the Community.</p>
+        <p>Email: info@ackchurch.org | Phone: +254 700 000 000</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function showSchoolLogin() {
+            const loginMsg = document.getElementById('login-message');
+            if (loginMsg) loginMsg.style.display = 'block';
+
+            const modalEl = document.getElementById('loginModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    </script>
+
+    {% if messages %}
+    <script>
+        (function () {
+            const modalEl = document.getElementById('loginModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+
+            setTimeout(() => {
+                const alertBox = document.getElementById('modal-alert');
+                if (!alertBox) return;
+                alertBox.style.transition = 'opacity .7s, transform .7s';
+                alertBox.style.opacity = 0;
+                alertBox.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    if (alertBox && alertBox.parentNode) alertBox.parentNode.removeChild(alertBox);
+                }, 800);
+            }, 2000);
+        })();
+    </script>
+    {% endif %}
+
+    <script>
+        // Theme toggle
+        const body = document.body;
+        const btn = document.getElementById("themeBtn");
+        const lastMode = localStorage.getItem("theme");
+
+        if (lastMode) {
+            body.className = lastMode;
+            btn.textContent = lastMode === "dark-mode" ? "☀️" : "🌙";
+        }
+
+        btn.addEventListener("click", () => {
+            if (body.classList.contains("light-mode")) {
+                body.classList.replace("light-mode", "dark-mode");
+                btn.textContent = "☀️";
+                localStorage.setItem("theme", "dark-mode");
+            } else {
+                body.classList.replace("dark-mode", "light-mode");
+                btn.textContent = "🌙";
+                localStorage.setItem("theme", "light-mode");
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

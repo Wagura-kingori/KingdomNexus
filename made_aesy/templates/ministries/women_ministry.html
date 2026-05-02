@@ -1,0 +1,139 @@
+{% extends 'church_base.html' %}
+{% load static %}
+
+{% block title %}Women’s Guild — ACK Church{% endblock %}
+
+{% block extra_head %}
+<style>
+    .mini-hero {
+        background: linear-gradient(90deg, #f9b4d1, #ffe5f0);
+        padding: 40px;
+        border-radius: 14px;
+        text-align: center;
+        color: #4a0038;
+    }
+
+    .ministry-card {
+        background: #fff6fa;
+        border-radius: 14px;
+        padding: 20px;
+        border: 1px solid #f2c8dd;
+    }
+
+    .leader-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #ffdbec;
+    }
+
+    .gallery-img {
+        width: 100%;
+        border-radius: 12px;
+        height: 180px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mini-hero mb-4">
+    <h2>Women’s Guild (Mothers’ Union)</h2>
+    <p class="lead">Empowering women spiritually, socially, and in Christian service.</p>
+</div>
+
+<!-- Mission -->
+<div class="ministry-card mb-4">
+    <h4 class="mb-2">Our Mission</h4>
+    <p>
+        To nurture Christian families, empower women, support church programs, and uphold moral,
+        spiritual, and social growth in society according to the ACK Mothers’ Union values.
+    </p>
+</div>
+
+<!-- What we do -->
+<h4 class="mb-3">Core Activities</h4>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="ministry-card">
+            <h6>✝️ Bible Study & Fellowship</h6>
+            <p>Weekly fellowship focused on spiritual growth, scripture study and discipleship.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="ministry-card">
+            <h6>❤️ Marriage & Family Support</h6>
+            <p>Mentorship for young mothers, marriage guidance, home visits and prayer support.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="ministry-card">
+            <h6>🤝 Charity & Outreach</h6>
+            <p>Hospital visits, supporting the needy, community projects and social welfare missions.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="ministry-card">
+            <h6>🪡 Skills & Economic Empowerment</h6>
+            <p>Training in crafts, financial stewardship, savings groups, and leadership development.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="ministry-card">
+            <h6>🎶 Choir & Worship Support</h6>
+            <p>Women’s Guild choir leads praise, worship and supports church liturgical activities.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Leadership -->
+<h4 class="mt-5 mb-3">Leadership</h4>
+<div class="row g-4">
+
+    <div class="col-md-3 text-center">
+        <img src="{% static 'images/leader-placeholder.jpg' %}" class="leader-img">
+        <p class="mt-2 mb-0"><strong>Mrs. Jane Mwangi</strong></p>
+        <p class="small text-muted">Guild Chairlady</p>
+    </div>
+
+    <div class="col-md-3 text-center">
+        <img src="{% static 'images/leader-placeholder.jpg' %}" class="leader-img">
+        <p class="mt-2 mb-0"><strong>Mrs. Mary Wairimu</strong></p>
+        <p class="small text-muted">Vice Chairlady</p>
+    </div>
+
+    <div class="col-md-3 text-center">
+        <img src="{% static 'images/leader-placeholder.jpg' %}" class="leader-img">
+        <p class="mt-2 mb-0"><strong>Rev. Grace Njeri</strong></p>
+        <p class="small text-muted">Chaplain</p>
+    </div>
+
+</div>
+
+<!-- Gallery -->
+<h4 class="mt-5 mb-3">Gallery</h4>
+<div class="row g-2">
+    <div class="col-md-4"><img src="{% static 'images/guild1.jpg' %}" class="gallery-img"></div>
+    <div class="col-md-4"><img src="{% static 'images/guild2.jpg' %}" class="gallery-img"></div>
+    <div class="col-md-4"><img src="{% static 'images/guild3.jpg' %}" class="gallery-img"></div>
+</div>
+
+<!-- Scripture -->
+<div class="ministry-card mt-4">
+    <h5 class="mb-2">Scripture Inspiration</h5>
+    <p class="mb-1">“A woman who fears the Lord is to be praised.”</p>
+    <p class="small text-muted">— Proverbs 31:30</p>
+</div>
+
+<!-- Join Us -->
+<div class="mt-4 text-center">
+    <a class="btn btn-primary px-4 py-2" href="/contact/">Join the Women’s Guild</a>
+</div>
+
+{% endblock %}

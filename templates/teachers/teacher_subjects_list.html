@@ -1,0 +1,15 @@
+{% extends 'dashboard_base.html' %}
+{% block content %}
+<h2>My Subjects</h2>
+
+<ul class="list-group">
+    {% for subj in subjects %}
+    <li class="list-group-item d-flex justify-content-between">
+        <span>{{ subj.name }} - {{ subj.classroom.name }}</span>
+        <a href="{% url 'teacher_subject_detail' subj.id %}" class="btn btn-primary btn-sm">Open</a>
+    </li>
+    {% empty %}
+    <li class="list-group-item">No subjects assigned.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,1162 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — {{ teacher.user.get_full_name }}{% endblock %}
+
+{% block extra_head %}
+<link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+<style>
+    /* ══════════════════════════════════════════════
+   GLOBAL PAGE OVERRIDES
+   
+══════════════════════════════════════════════ */
+    body,
+    body.light-mode,
+    body.dark-mode {
+        background-color: #080f1c !important;
+        color: #e2e8f0 !important;
+    }
+
+    /* Push content below base.html fixed navbar (60px) + the new sub-navbar (52px) */
+    main.container {
+        padding-top: 0 !important;
+        max-width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* ══════════════════════════════════════════════
+   SUB-NAVBAR  (sits directly under base navbar)
+══════════════════════════════════════════════ */
+    .td-subnav {
+        background: rgba(10, 20, 38, 0.98);
+        border-bottom: 1px solid rgba(56, 189, 248, .1);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        display: flex;
+        align-items: center;
+        height: 52px;
+        padding: 0 1.6rem;
+        gap: 0;
+        position: sticky;
+        top: 60px;
+        /* sits directly below base navbar */
+        z-index: 900;
+    }
+
+    .td-brand {
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: 2.8px;
+        text-transform: uppercase;
+        color: #38bdf8;
+        white-space: nowrap;
+        padding-right: 1.2rem;
+        border-right: 1px solid rgba(255, 255, 255, .08);
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        flex-shrink: 0;
+        text-decoration: none !important;
+    }
+
+    .td-brand-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #38bdf8;
+        box-shadow: 0 0 8px rgba(56, 189, 248, .7);
+        animation: tdPulse 2.5s infinite;
+    }
+
+    @keyframes tdPulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 6px rgba(56, 189, 248, .6);
+        }
+
+        50% {
+            box-shadow: 0 0 14px rgba(56, 189, 248, .9);
+        }
+    }
+
+    .td-nav-scroll {
+        display: flex;
+        align-items: center;
+        gap: .1rem;
+        overflow-x: auto;
+        flex: 1;
+        padding: 0 .8rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .td-nav-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    .td-nav-item {
+        display: inline-flex;
+        align-items: center;
+        gap: .42rem;
+        padding: .36rem .82rem;
+        border-radius: 8px;
+        font-size: .76rem;
+        font-weight: 500;
+        color: #64748b;
+        text-decoration: none !important;
+        white-space: nowrap;
+        transition: all .15s;
+        border: 1px solid transparent;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .td-nav-item i {
+        font-size: .7rem;
+    }
+
+    .td-nav-item:hover,
+    .td-nav-item.active {
+        background: rgba(56, 189, 248, .1);
+        color: #e2e8f0;
+        border-color: rgba(56, 189, 248, .18);
+    }
+
+    .td-nav-item.active {
+        color: #38bdf8;
+        font-weight: 600;
+    }
+
+    .td-nav-item:hover i,
+    .td-nav-item.active i {
+        color: #38bdf8;
+    }
+
+    /* Profile pill */
+    .td-profile-wrap {
+        flex-shrink: 0;
+        margin-left: .4rem;
+        padding-left: 1rem;
+        border-left: 1px solid rgba(255, 255, 255, .08);
+        position: relative;
+    }
+
+    .td-profile-btn {
+        display: flex;
+        align-items: center;
+        gap: .55rem;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: .28rem .5rem;
+        border-radius: 10px;
+        transition: background .15s;
+    }
+
+    .td-profile-btn:hover {
+        background: rgba(56, 189, 248, .08);
+    }
+
+    .td-avatar-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0369a1, #38bdf8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .72rem;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+        border: 2px solid rgba(56, 189, 248, .3);
+        transition: border-color .2s;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .td-profile-btn:hover .td-avatar-sm {
+        border-color: rgba(56, 189, 248, .65);
+    }
+
+    .td-profile-label {
+        font-size: .76rem;
+        font-weight: 600;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: .38rem;
+    }
+
+    .td-caret {
+        width: 6px;
+        height: 6px;
+        border-right: 1.5px solid #64748b;
+        border-bottom: 1.5px solid #64748b;
+        transform: rotate(45deg);
+        margin-top: -2px;
+        transition: transform .2s;
+        flex-shrink: 0;
+    }
+
+    .td-profile-wrap.open .td-caret {
+        transform: rotate(-135deg);
+        margin-top: 2px;
+    }
+
+    /* Profile dropdown */
+    .td-dropdown {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        width: 280px;
+        background: #0d1b2e;
+        border: 1px solid rgba(56, 189, 248, .15);
+        border-radius: 16px;
+        box-shadow: 0 28px 70px rgba(0, 0, 0, .7);
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-8px) scale(.97);
+        pointer-events: none;
+        transition: opacity .2s, transform .2s;
+        z-index: 9999;
+    }
+
+    .td-profile-wrap.open .td-dropdown {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: all;
+    }
+
+    .td-drop-head {
+        padding: 1.1rem 1.2rem;
+        background: linear-gradient(135deg, rgba(14, 165, 233, .08), transparent);
+        border-bottom: 1px solid rgba(255, 255, 255, .06);
+        display: flex;
+        align-items: flex-start;
+        gap: .9rem;
+    }
+
+    .td-avatar-lg {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0369a1, #38bdf8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+        box-shadow: 0 4px 16px rgba(14, 165, 233, .4);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .td-drop-name {
+        font-weight: 700;
+        font-size: .9rem;
+        color: #f1f5f9;
+        line-height: 1.3;
+    }
+
+    .td-drop-email {
+        font-size: .72rem;
+        color: #475569;
+        margin-top: .15rem;
+    }
+
+    .td-role-badge {
+        display: inline-block;
+        border-radius: 20px;
+        padding: .15rem .65rem;
+        font-size: .64rem;
+        font-weight: 700;
+        letter-spacing: .9px;
+        text-transform: uppercase;
+        margin-top: .4rem;
+    }
+
+    .td-role-gold {
+        background: rgba(251, 191, 36, .12);
+        border: 1px solid rgba(251, 191, 36, .25);
+        color: #fcd34d;
+    }
+
+    .td-role-blue {
+        background: rgba(56, 189, 248, .1);
+        border: 1px solid rgba(56, 189, 248, .2);
+        color: #38bdf8;
+    }
+
+    .td-drop-body {
+        padding: .45rem 0;
+    }
+
+    .td-drop-row {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: .5rem 1.2rem;
+        font-size: .79rem;
+        color: #94a3b8;
+        border-bottom: 1px solid rgba(255, 255, 255, .04);
+    }
+
+    .td-drop-row:last-child {
+        border-bottom: none;
+    }
+
+    .td-drop-row i {
+        color: #38bdf8;
+        font-size: .75rem;
+        width: 14px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .td-drop-row strong {
+        color: #475569;
+        font-weight: 600;
+        min-width: 48px;
+        display: inline-block;
+    }
+
+    .td-drop-row span {
+        color: #cbd5e1;
+    }
+
+    .td-status-dot {
+        color: #34d399 !important;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+    }
+
+    .td-status-dot::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #34d399;
+        box-shadow: 0 0 6px rgba(52, 211, 153, .7);
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .td-drop-footer {
+        padding: .8rem 1.1rem;
+        border-top: 1px solid rgba(255, 255, 255, .06);
+        background: rgba(0, 0, 0, .2);
+        display: flex;
+        gap: .5rem;
+    }
+
+    .td-dbtn {
+        flex: 1;
+        text-align: center;
+        font-size: .74rem;
+        font-weight: 600;
+        border-radius: 9px;
+        padding: .44rem .5rem;
+        cursor: pointer;
+        border: 1px solid;
+        transition: all .15s;
+        text-decoration: none !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .38rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        line-height: 1.4;
+    }
+
+    .td-dbtn-ghost {
+        background: rgba(255, 255, 255, .04);
+        border-color: rgba(255, 255, 255, .1);
+        color: #94a3b8;
+    }
+
+    .td-dbtn-ghost:hover {
+        background: rgba(255, 255, 255, .09);
+        color: #e2e8f0;
+        border-color: rgba(255, 255, 255, .2);
+    }
+
+    .td-dbtn-danger {
+        background: rgba(239, 68, 68, .08);
+        border-color: rgba(239, 68, 68, .22);
+        color: #fca5a5;
+    }
+
+    .td-dbtn-danger:hover {
+        background: rgba(239, 68, 68, .2);
+        color: #fff;
+        border-color: rgba(239, 68, 68, .45);
+    }
+
+
+    /* ══════════════════════════════════════════════
+   PAGE WRAPPER
+══════════════════════════════════════════════ */
+    #td-page {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #e2e8f0;
+        padding: 2rem 1.8rem 5rem;
+        max-width: 1240px;
+        margin: 0 auto;
+    }
+
+    /* ── HERO ── */
+    #td-page .td-hero {
+        background: linear-gradient(135deg, #0c2035 0%, #0e2d4d 55%, #0b3a61 100%);
+        border-radius: 20px;
+        padding: 2.8rem 3rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(56, 189, 248, .12);
+        box-shadow: 0 24px 64px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .04);
+        animation: tdFadeUp .45s ease both;
+    }
+
+    #td-page .td-hero::before {
+        content: '';
+        position: absolute;
+        top: -80px;
+        right: -80px;
+        width: 320px;
+        height: 320px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(56, 189, 248, .09) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    #td-page .td-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -70px;
+        left: 38%;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(14, 165, 233, .06) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    #td-page .td-hero-inner {
+        position: relative;
+        z-index: 2;
+    }
+
+    #td-page .td-label {
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #38bdf8;
+        margin-bottom: .5rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    #td-page .td-label::before {
+        content: '';
+        width: 20px;
+        height: 2px;
+        background: linear-gradient(90deg, #38bdf8, #7dd3fc);
+        border-radius: 2px;
+        display: inline-block;
+    }
+
+    #td-page .td-greeting {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2.7rem;
+        font-weight: 700;
+        color: #f0f9ff;
+        margin: 0 0 1.1rem;
+        line-height: 1.12;
+        letter-spacing: -.5px;
+    }
+
+    #td-page .td-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        background: rgba(255, 255, 255, .06);
+        border: 1px solid rgba(255, 255, 255, .1);
+        border-radius: 30px;
+        padding: .3rem .88rem;
+        font-size: .77rem;
+        font-weight: 500;
+        color: #cbd5e1;
+        backdrop-filter: blur(8px);
+    }
+
+    #td-page .td-pill i {
+        color: #38bdf8;
+        font-size: .7rem;
+    }
+
+    #td-page .td-pill-gold {
+        background: rgba(251, 191, 36, .1);
+        border-color: rgba(251, 191, 36, .25);
+        color: #fcd34d;
+    }
+
+    #td-page .td-pill-gold i {
+        color: #fbbf24;
+    }
+
+    /* ── STATS ── */
+    #td-page .td-stat {
+        background: #0d1b2e;
+        border: 1px solid rgba(255, 255, 255, .07);
+        border-radius: 16px;
+        padding: 1.35rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: transform .2s, box-shadow .2s, border-color .2s;
+        animation: tdFadeUp .5s ease both;
+    }
+
+    #td-page .td-stat:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 36px rgba(0, 0, 0, .45);
+        border-color: rgba(56, 189, 248, .22);
+    }
+
+    #td-page .td-stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    #td-page .tsi-blue {
+        background: rgba(59, 130, 246, .14);
+        color: #60a5fa;
+    }
+
+    #td-page .tsi-cyan {
+        background: rgba(6, 182, 212, .14);
+        color: #22d3ee;
+    }
+
+    #td-page .tsi-green {
+        background: rgba(16, 185, 129, .14);
+        color: #34d399;
+    }
+
+    #td-page .td-stat-num {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        line-height: 1;
+        font-family: 'Cormorant Garamond', serif;
+    }
+
+    #td-page .td-stat-lbl {
+        font-size: .73rem;
+        color: #475569;
+        margin-top: .2rem;
+        font-weight: 500;
+        letter-spacing: .3px;
+    }
+
+    /* ── SECTION HEADING ── */
+    #td-page .td-heading {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+    }
+
+    #td-page .td-heading .th-icon {
+        width: 32px;
+        height: 32px;
+        background: rgba(56, 189, 248, .1);
+        border: 1px solid rgba(56, 189, 248, .2);
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .82rem;
+        color: #38bdf8;
+        flex-shrink: 0;
+    }
+
+    #td-page .td-heading::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(56, 189, 248, .2), transparent);
+        margin-left: .5rem;
+    }
+
+    /* ── SUBJECT CARDS ── */
+    #td-page .td-subject-card {
+        background: #0d1b2e;
+        border: 1px solid rgba(255, 255, 255, .07);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: transform .25s, box-shadow .25s, border-color .25s;
+        animation: tdFadeUp .5s ease both;
+    }
+
+    #td-page .td-subject-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 22px 52px rgba(0, 0, 0, .55);
+        border-color: rgba(56, 189, 248, .28);
+    }
+
+    #td-page .td-subject-top {
+        padding: 1.5rem 1.6rem 1.3rem;
+        flex: 1;
+        position: relative;
+    }
+
+    #td-page .td-subject-top::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 100%;
+        background: linear-gradient(180deg, #38bdf8, #0284c7);
+        border-radius: 0 2px 2px 0;
+    }
+
+    #td-page .td-subj-code {
+        display: inline-block;
+        background: rgba(56, 189, 248, .1);
+        border: 1px solid rgba(56, 189, 248, .2);
+        color: #38bdf8;
+        border-radius: 6px;
+        padding: .2rem .65rem;
+        font-size: .68rem;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        margin-bottom: .8rem;
+    }
+
+    #td-page .td-subj-name {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin: 0 0 .5rem;
+        line-height: 1.3;
+    }
+
+    #td-page .td-subj-hint {
+        font-size: .77rem;
+        color: #334155;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+    }
+
+    #td-page .td-subj-hint i {
+        color: #1e3a5f;
+    }
+
+    #td-page .td-subject-actions {
+        padding: .85rem 1.5rem;
+        background: rgba(0, 0, 0, .25);
+        border-top: 1px solid rgba(255, 255, 255, .05);
+        display: flex;
+        gap: .6rem;
+        flex-wrap: wrap;
+    }
+
+    /* ── BUTTONS ── */
+    #td-page .tdbtn {
+        font-size: .77rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: .4rem .95rem;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        border: none;
+        cursor: pointer;
+        text-decoration: none !important;
+        letter-spacing: .15px;
+    }
+
+    #td-page .tdbtn-primary {
+        background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(14, 165, 233, .28);
+    }
+
+    #td-page .tdbtn-primary:hover {
+        background: linear-gradient(135deg, #0284c7, #0ea5e9);
+        color: #fff;
+        box-shadow: 0 6px 22px rgba(14, 165, 233, .4);
+        transform: translateY(-1px);
+    }
+
+    #td-page .tdbtn-ghost {
+        background: rgba(255, 255, 255, .04);
+        border: 1px solid rgba(255, 255, 255, .1);
+        color: #64748b;
+    }
+
+    #td-page .tdbtn-ghost:hover {
+        background: rgba(255, 255, 255, .09);
+        color: #e2e8f0;
+        border-color: rgba(255, 255, 255, .2);
+    }
+
+    /* ── EMPTY STATE ── */
+    #td-page .td-empty {
+        background: #0d1b2e;
+        border: 1px dashed rgba(56, 189, 248, .18);
+        border-radius: 16px;
+        padding: 4rem 2rem;
+        text-align: center;
+        animation: tdFadeUp .5s ease both;
+    }
+
+    #td-page .td-empty-icon {
+        width: 74px;
+        height: 74px;
+        border-radius: 50%;
+        background: rgba(56, 189, 248, .07);
+        border: 1px solid rgba(56, 189, 248, .14);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: #1e4060;
+        margin: 0 auto 1.2rem;
+    }
+
+    #td-page .td-empty h5 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.3rem;
+        color: #94a3b8;
+        margin-bottom: .5rem;
+    }
+
+    #td-page .td-empty p {
+        font-size: .84rem;
+        color: #334155;
+        max-width: 320px;
+        margin: 0 auto;
+        line-height: 1.75;
+    }
+
+    /* ── SEPARATOR ── */
+    #td-page .td-sep {
+        height: 1px;
+        background: linear-gradient(90deg, rgba(56, 189, 248, .25), transparent);
+        margin: 1.8rem 0;
+    }
+
+    /* ══════════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════════ */
+    @keyframes tdFadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #td-page .td-stat:nth-child(1) {
+        animation-delay: .06s;
+    }
+
+    #td-page .td-stat:nth-child(2) {
+        animation-delay: .12s;
+    }
+
+    #td-page .td-stat:nth-child(3) {
+        animation-delay: .18s;
+    }
+
+    #td-page .td-subject-card:nth-child(1) {
+        animation-delay: .10s;
+    }
+
+    #td-page .td-subject-card:nth-child(2) {
+        animation-delay: .18s;
+    }
+
+    #td-page .td-subject-card:nth-child(3) {
+        animation-delay: .26s;
+    }
+
+    #td-page .td-subject-card:nth-child(4) {
+        animation-delay: .34s;
+    }
+
+    #td-page .td-subject-card:nth-child(5) {
+        animation-delay: .40s;
+    }
+
+    #td-page .td-subject-card:nth-child(6) {
+        animation-delay: .46s;
+    }
+
+    /* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+        .td-subnav {
+            padding: 0 .9rem;
+            top: 56px;
+        }
+
+        .td-profile-label {
+            display: none;
+        }
+
+        #td-page {
+            padding: 1.4rem 1rem 4rem;
+        }
+
+        #td-page .td-hero {
+            padding: 1.8rem 1.4rem;
+        }
+
+        #td-page .td-greeting {
+            font-size: 1.85rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        #td-page .td-greeting {
+            font-size: 1.5rem;
+        }
+
+        #td-page .td-hero {
+            padding: 1.4rem 1.1rem;
+        }
+
+        .td-brand {
+            letter-spacing: 1.5px;
+            font-size: .6rem;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{# ══════════ SUB-NAVBAR ══════════ #}
+<nav class="td-subnav">
+
+    {# Brand #}
+    <a href="{% url 'teachers:dashboard' %}" class="td-brand">
+        <span class="td-brand-dot"></span> Teacher Portal
+    </a>
+
+    {# Scrollable links #}
+    <div class="td-nav-scroll">
+        <a href="{% url 'teachers:dashboard' %}" class="td-nav-item active"><i class="fas fa-th-large"></i>
+            Dashboard</a>
+        <a href="{% url 'attendance:attendance_list' %}" class="td-nav-item"><i class="fas fa-clipboard-check"></i>
+            Attendance</a>
+        <a href="{% url 'timetable:timetable_list' %}" class="td-nav-item"><i class="fas fa-calendar-alt"></i>
+            Timetable</a>
+        <a href="{% url 'messaging:messages_list' %}" class="td-nav-item"><i class="fas fa-envelope"></i> Messages</a>
+        <a href="{% url 'messaging:notices_list' %}" class="td-nav-item"><i class="fas fa-bell"></i> Notices</a>
+        <a href="/academics/" class="td-nav-item"><i class="fas fa-graduation-cap"></i> Academics</a>
+        <a href="/students/" class="td-nav-item"><i class="fas fa-user-graduate"></i> Students</a>
+    </div>
+
+    {# Profile button + dropdown #}
+    <div class="td-profile-wrap" id="tdProfileWrap">
+        <button class="td-profile-btn" id="tdProfileBtn" type="button" aria-expanded="false" aria-haspopup="true">
+            <div class="td-avatar-sm">
+                {{ teacher.user.first_name|slice:":1"|upper }}{{ teacher.user.last_name|slice:":1"|upper }}
+            </div>
+            <div class="td-profile-label">
+                {{ teacher.user.first_name|default:teacher.user.username }}
+                <span class="td-caret"></span>
+            </div>
+        </button>
+
+        {# Dropdown #}
+        <div class="td-dropdown" id="tdDrop" role="dialog" aria-label="Profile menu">
+
+            <div class="td-drop-head">
+                <div class="td-avatar-lg">
+                    {{ teacher.user.first_name|slice:":1"|upper }}{{ teacher.user.last_name|slice:":1"|upper }}
+                </div>
+                <div>
+                    <div class="td-drop-name">{{ teacher.user.get_full_name|default:teacher.user.username }}</div>
+                    <div class="td-drop-email">{{ teacher.user.email|default:"—" }}</div>
+                    {% if teacher.is_class_teacher %}
+                    <div class="td-role-badge td-role-gold"><i class="fas fa-star me-1"></i>Class Teacher</div>
+                    {% else %}
+                    <div class="td-role-badge td-role-blue"><i class="fas fa-chalkboard-teacher me-1"></i>Subject
+                        Teacher</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="td-drop-body">
+                <div class="td-drop-row">
+                    <i class="fas fa-id-card"></i>
+                    <strong>Emp No</strong>
+                    <span>{{ teacher.employee_number }}</span>
+                </div>
+                <div class="td-drop-row">
+                    <i class="fas fa-layer-group"></i>
+                    <strong>Dept</strong>
+                    <span>{{ teacher.department|default:"Not set" }}</span>
+                </div>
+                <div class="td-drop-row">
+                    <i class="fas fa-school"></i>
+                    <strong>School</strong>
+                    <span>{{ school.name }}</span>
+                </div>
+                <div class="td-drop-row">
+                    <i class="fas fa-shield-alt"></i>
+                    <strong>Status</strong>
+                    <span class="td-status-dot">Active</span>
+                </div>
+            </div>
+
+            <div class="td-drop-footer">
+                <a href="{% url 'profiles:view' %}" class="td-dbtn td-dbtn-ghost">
+                    <i class="fas fa-user-cog"></i> Edit Profile
+                </a>
+                <form method="POST" action="{% url 'logout' %}" style="flex:1;display:flex;margin:0;padding:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="td-dbtn td-dbtn-danger" style="width:100%;">
+                        <i class="fas fa-sign-out-alt"></i> Sign Out
+                    </button>
+                </form>
+            </div>
+
+        </div>{# /td-dropdown #}
+    </div>{# /td-profile-wrap #}
+
+</nav>
+{# ══════════ /SUB-NAVBAR ══════════ #}
+
+
+{# ══════════ PAGE BODY ══════════ #}
+<div id="td-page">
+
+    {# HERO #}
+    <div class="td-hero mb-4">
+        <div class="td-hero-inner">
+            <div class="td-label">Teacher Dashboard</div>
+            <h1 class="td-greeting">Good day, {{ teacher.user.first_name|default:teacher.user.username }}.</h1>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="td-pill"><i class="fas fa-school"></i> {{ school.name }}</span>
+                <span class="td-pill"><i class="fas fa-id-badge"></i> {{ teacher.employee_number }}</span>
+                {% if teacher.department %}
+                <span class="td-pill"><i class="fas fa-layer-group"></i> {{ teacher.department }}</span>
+                {% endif %}
+                {% if teacher.is_class_teacher %}
+                <span class="td-pill td-pill-gold"><i class="fas fa-star"></i> Class Teacher</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# STATS #}
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4">
+            <div class="td-stat">
+                <div class="td-stat-icon tsi-blue"><i class="fas fa-book-open"></i></div>
+                <div>
+                    <div class="td-stat-num">{{ subjects.count }}</div>
+                    <div class="td-stat-lbl">Subjects Assigned</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="td-stat">
+                <div class="td-stat-icon tsi-cyan"><i class="fas fa-university"></i></div>
+                <div>
+                    <div class="td-stat-num" style="font-size:1rem;line-height:1.35;">
+                        {{ school.name|truncatechars:15 }}
+                    </div>
+                    <div class="td-stat-lbl">Your School</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="td-stat">
+                <div class="td-stat-icon tsi-green"><i class="fas fa-shield-alt"></i></div>
+                <div>
+                    <div class="td-stat-num" style="font-size:1.05rem;">Active</div>
+                    <div class="td-stat-lbl">Account Status</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="td-sep"></div>
+
+    {# SUBJECTS GRID #}
+    <div class="td-heading">
+        <span class="th-icon"><i class="fas fa-book-open"></i></span>
+        My Assigned Subjects
+    </div>
+
+    {% if subjects %}
+    <div class="row g-3">
+       {# ── Grouped by classroom ── #}
+{% regroup assignments by classroom as classroom_groups %}
+
+{% for classroom_group in classroom_groups %}
+<div class="td-heading" style="margin-top:1.5rem;">
+    <span class="th-icon"><i class="fas fa-door-open"></i></span>
+    {{ classroom_group.grouper.class_grade }} — {{ classroom_group.grouper.section }}
+    {% if classroom_group.grouper.class_teacher == request.user %}
+    <span style="font-size:.7rem;font-weight:600;color:#fbbf24;margin-left:.5rem;">
+        <i class="fas fa-star"></i> Your Class
+    </span>
+    {% endif %}
+</div>
+
+<div class="row g-3 mb-3">
+    {% for assignment in classroom_group.list %}
+    <div class="col-sm-6 col-lg-4">
+        <div class="td-subject-card">
+            <div class="td-subject-top">
+                {% if assignment.subject.code %}
+                <div class="td-subj-code">{{ assignment.subject.code }}</div>
+                {% endif %}
+                <h5 class="td-subj-name">{{ assignment.subject.name }}</h5>
+                <div class="td-subj-hint">
+                    <i class="fas fa-door-open"></i>
+                    {{ assignment.classroom.class_grade }} {{ assignment.classroom.section }}
+                </div>
+            </div>
+            <div class="td-subject-actions">
+                <a href="{% url 'teachers:subject_exams' assignment.id %}"
+                   class="tdbtn tdbtn-primary">
+                    <i class="fas fa-file-alt"></i> Exams &amp; Results
+                </a>
+                <a href="{% url 'teachers:subject_students' assignment.id %}"
+                   class="tdbtn tdbtn-ghost">
+                    <i class="fas fa-users"></i> Students
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% empty %}
+<div class="td-empty">
+    <div class="td-empty-icon"><i class="fas fa-book-open"></i></div>
+    <h5>No Subjects Assigned Yet</h5>
+    <p>Your class teacher or admin hasn't assigned any subjects to you yet.</p>
+</div>
+{% endfor %}
+
+{# Class teacher section #}
+{% if class_teacher_rooms %}
+<div class="td-sep"></div>
+<div class="td-heading">
+    <span class="th-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+    My Classrooms (Class Teacher)
+</div>
+<div class="row g-3">
+    {% for room in class_teacher_rooms %}
+    <div class="col-sm-6 col-lg-4">
+        <a href="{% url 'teachers:class_teacher_view' room.id %}"
+           style="text-decoration:none;">
+            <div class="td-subject-card" style="border-color:rgba(251,191,36,.2);">
+                <div class="td-subject-top" style="border-left-color:#fbbf24;">
+                    <div class="td-subj-code" style="color:#fbbf24;border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.08);">
+                        Class Teacher
+                    </div>
+                    <h5 class="td-subj-name">
+                        {{ room.class_grade }} — {{ room.section }}
+                    </h5>
+                    <div class="td-subj-hint">
+                        <i class="fas fa-users" style="color:#fbbf24;"></i>
+                        Manage all subjects &amp; assignments
+                    </div>
+                </div>
+                <div class="td-subject-actions">
+                    <span class="tdbtn tdbtn-primary" style="background:linear-gradient(135deg,#b45309,#fbbf24);">
+                        <i class="fas fa-cog"></i> Manage Classroom
+                    </span>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+    </div>
+
+    {% else %}
+    <div class="td-empty">
+        <div class="td-empty-icon"><i class="fas fa-book-open"></i></div>
+        <h5>No Subjects Assigned Yet</h5>
+        <p>Your administrator hasn't assigned any subjects to you yet.
+            Please contact your school admin to get started.</p>
+    </div>
+    {% endif %}
+
+</div>{# /#td-page #}
+
+
+{# ══════════ DROPDOWN SCRIPT ══════════ #}
+<script>
+    (function () {
+        var wrap = document.getElementById('tdProfileWrap');
+        var btn = document.getElementById('tdProfileBtn');
+        if (!wrap || !btn) return;
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var isOpen = wrap.classList.toggle('open');
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!wrap.contains(e.target)) {
+                wrap.classList.remove('open');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && wrap.classList.contains('open')) {
+                wrap.classList.remove('open');
+                btn.setAttribute('aria-expanded', 'false');
+                btn.focus();
+            }
+        });
+    })();
+</script>
+
+{% endblock %}

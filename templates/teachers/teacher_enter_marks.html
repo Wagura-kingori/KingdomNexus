@@ -1,0 +1,14 @@
+{% extends 'dashboard_base.html' %}
+{% block content %}
+<h2>Enter Marks for {{ student }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label>Score</label>
+        <input type="number" name="score" class="form-control" value="{{ result.score }}">
+    </div>
+    <button class="btn btn-primary">Save</button>
+</form>
+
+{% endblock %}

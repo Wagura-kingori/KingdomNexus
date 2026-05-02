@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Borrow Form{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title }}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="card p-4 shadow-sm">
+
+            <div class="mb-3">
+                {{ form.student.label_tag }}
+                {{ form.student }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.book.label_tag }}
+                {{ form.book }}
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.date_borrowed.label_tag }}
+                    {{ form.date_borrowed }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.due_date.label_tag }}
+                    {{ form.due_date }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                {{ form.date_returned.label_tag }}
+                {{ form.date_returned }}
+            </div>
+
+            <button class="btn btn-success">Save</button>
+            <a href="{% url 'library:borrow_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

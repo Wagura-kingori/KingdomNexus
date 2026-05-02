@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% block title %}{{ classroom }} — Class Teacher View{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body,body.light-mode,body.dark-mode{background-color:#080f1c!important;color:#e2e8f0!important;}
+main.container{padding-top:0!important;max-width:100%!important;padding-left:0!important;padding-right:0!important;}
+
+/* ── SUB-NAV ── */
+.ct-subnav{background:rgba(10,20,38,.98);border-bottom:1px solid rgba(251,191,36,.12);backdrop-filter:blur(16px);display:flex;align-items:center;height:52px;padding:0 1.6rem;gap:.8rem;position:sticky;top:60px;z-index:900;}
+.ct-back{display:inline-flex;align-items:center;gap:.45rem;font-size:.76rem;font-weight:600;color:#64748b;text-decoration:none!important;padding:.32rem .75rem;border-radius:8px;border:1px solid rgba(255,255,255,.07);transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;}
+.ct-back:hover{background:rgba(251,191,36,.08);color:#fbbf24;border-color:rgba(251,191,36,.25);}
+.ct-back i{font-size:.7rem;}
+.ct-nav-title{font-size:.7rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#fbbf24;flex:1;}
+.ct-breadcrumb{font-size:.73rem;color:#334155;display:flex;align-items:center;gap:.4rem;}
+.ct-breadcrumb a{color:#475569;text-decoration:none;}
+.ct-breadcrumb a:hover{color:#fbbf24;}
+.ct-breadcrumb i{font-size:.55rem;}
+
+/* ── PAGE ── */
+#ct-page{font-family:'Plus Jakarta Sans',sans-serif;color:#e2e8f0;padding:2rem 1.8rem 5rem;max-width:1200px;margin:0 auto;animation:ctFade .4s ease both;}
+@keyframes ctFade{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── HERO ── */
+#ct-page .ct-hero{background:linear-gradient(135deg,#1a0e00 0%,#2d1a00 50%,#3d2400 100%);border-radius:20px;padding:2.4rem 2.8rem;margin-bottom:2rem;position:relative;overflow:hidden;border:1px solid rgba(251,191,36,.18);box-shadow:0 20px 56px rgba(0,0,0,.5);}
+#ct-page .ct-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.07) 0%,transparent 70%);}
+#ct-page .ct-hero-inner{position:relative;z-index:2;}
+#ct-page .ct-label{font-size:.68rem;font-weight:700;letter-spacing:2.8px;text-transform:uppercase;color:#fbbf24;margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem;}
+#ct-page .ct-label::before{content:'';width:14px;height:2px;background:#fbbf24;border-radius:2px;}
+#ct-page .ct-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:#fef3c7;margin:0 0 .6rem;line-height:1.15;}
+#ct-page .ct-pill{display:inline-flex;align-items:center;gap:.4rem;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:30px;padding:.28rem .8rem;font-size:.76rem;font-weight:500;color:#fde68a;}
+#ct-page .ct-pill i{color:#fbbf24;font-size:.7rem;}
+
+/* ── STAT ROW ── */
+#ct-page .ct-stats{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;}
+#ct-page .ct-stat{background:#0d1b2e;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:1.2rem 1.4rem;display:flex;align-items:center;gap:.9rem;flex:1;min-width:150px;transition:border-color .2s,transform .2s;}
+#ct-page .ct-stat:hover{border-color:rgba(251,191,36,.2);transform:translateY(-2px);}
+#ct-page .ct-stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.si-gold{background:rgba(251,191,36,.12);color:#fbbf24;}
+.si-blue{background:rgba(56,189,248,.12);color:#38bdf8;}
+.si-green{background:rgba(16,185,129,.12);color:#34d399;}
+.si-purple{background:rgba(167,139,250,.12);color:#a78bfa;}
+#ct-page .ct-stat-num{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:#f1f5f9;line-height:1;}
+#ct-page .ct-stat-lbl{font-size:.72rem;color:#475569;margin-top:.15rem;font-weight:500;}
+
+/* ── SECTION HEADING ── */
+#ct-page .ct-heading{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:1.1rem;display:flex;align-items:center;gap:.7rem;}
+#ct-page .ct-heading .ch-icon{width:30px;height:30px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:#fbbf24;flex-shrink:0;}
+#ct-page .ct-heading::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(251,191,36,.2),transparent);margin-left:.5rem;}
+
+/* ── ASSIGNMENT CARDS ── */
+#ct-page .ct-assign-card{background:#0d1b2e;border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
+#ct-page .ct-assign-card:hover{border-color:rgba(251,191,36,.2);box-shadow:0 8px 28px rgba(0,0,0,.4);}
+#ct-page .ct-assign-top{padding:1.2rem 1.4rem;border-left:3px solid #fbbf24;}
+#ct-page .ct-assign-subject{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:#f1f5f9;margin:0 0 .25rem;}
+#ct-page .ct-assign-teacher{font-size:.78rem;color:#64748b;display:flex;align-items:center;gap:.4rem;}
+#ct-page .ct-assign-teacher i{color:#fbbf24;font-size:.7rem;}
+#ct-page .ct-assign-actions{padding:.8rem 1.4rem;background:rgba(0,0,0,.2);border-top:1px solid rgba(255,255,255,.04);display:flex;gap:.5rem;flex-wrap:wrap;}
+
+/* ── TABLE ── */
+#ct-page .ct-card{background:#0d1b2e;border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;margin-bottom:1.4rem;}
+#ct-page .ct-card-head{padding:.9rem 1.4rem;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(251,191,36,.04);display:flex;align-items:center;gap:.65rem;}
+#ct-page .ct-card-head .ch-icon{width:28px;height:28px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.74rem;color:#fbbf24;flex-shrink:0;}
+#ct-page .ct-card-head h6{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:#f1f5f9;margin:0;}
+#ct-page .ct-card-head small{margin-left:auto;font-size:.7rem;color:#334155;}
+#ct-page .ct-table{width:100%;border-collapse:collapse;}
+#ct-page .ct-table thead tr{background:rgba(251,191,36,.04);border-bottom:1px solid rgba(251,191,36,.1);}
+#ct-page .ct-table thead th{padding:.8rem 1.1rem;text-align:left;font-size:.67rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#fbbf24;}
+#ct-page .ct-table tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .12s;}
+#ct-page .ct-table tbody tr:last-child{border-bottom:none;}
+#ct-page .ct-table tbody tr:hover{background:rgba(251,191,36,.02);}
+#ct-page .ct-table td{padding:.8rem 1.1rem;font-size:.83rem;color:#94a3b8;vertical-align:middle;}
+#ct-page .ct-table td.td-name{font-weight:600;color:#e2e8f0;}
+
+/* ── BUTTONS ── */
+#ct-page .ctbtn{display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;border-radius:8px;padding:.38rem .9rem;cursor:pointer;border:1px solid;transition:all .2s;text-decoration:none!important;}
+#ct-page .ctbtn-gold{background:linear-gradient(135deg,#b45309,#fbbf24);border-color:transparent;color:#1a0e00;box-shadow:0 4px 12px rgba(251,191,36,.25);}
+#ct-page .ctbtn-gold:hover{background:linear-gradient(135deg,#92400e,#f59e0b);color:#1a0e00;transform:translateY(-1px);}
+#ct-page .ctbtn-blue{background:linear-gradient(135deg,#0ea5e9,#38bdf8);border-color:transparent;color:#fff;box-shadow:0 4px 12px rgba(14,165,233,.25);}
+#ct-page .ctbtn-blue:hover{background:linear-gradient(135deg,#0284c7,#0ea5e9);color:#fff;transform:translateY(-1px);}
+#ct-page .ctbtn-ghost{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:#64748b;}
+#ct-page .ctbtn-ghost:hover{background:rgba(255,255,255,.08);color:#e2e8f0;border-color:rgba(255,255,255,.18);}
+#ct-page .ctbtn-sm{padding:.28rem .7rem;font-size:.72rem;}
+
+/* ── BADGE ── */
+#ct-page .ct-badge{display:inline-block;border-radius:6px;padding:.16rem .58rem;font-size:.67rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.badge-gold{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:#fbbf24;}
+.badge-blue{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);color:#38bdf8;}
+
+/* ── EMPTY ── */
+#ct-page .ct-empty{padding:2.5rem 1.5rem;text-align:center;}
+#ct-page .ct-empty i{font-size:1.8rem;color:#1e3a5f;display:block;margin-bottom:.8rem;}
+#ct-page .ct-empty p{font-size:.83rem;color:#334155;margin:0;}
+
+/* ── SEP ── */
+#ct-page .ct-sep{height:1px;background:linear-gradient(90deg,rgba(251,191,36,.2),transparent);margin:2rem 0;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){.ct-subnav{padding:0 .9rem;}.ct-breadcrumb{display:none;}#ct-page{padding:1.4rem 1rem 4rem;}#ct-page .ct-title{font-size:1.6rem;}}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<nav class="ct-subnav">
+    <a href="{% url 'teachers:dashboard' %}" class="ct-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+    <div class="ct-nav-title">Class Teacher — {{ classroom }}</div>
+    <div class="ct-breadcrumb">
+        <a href="{% url 'teachers:dashboard' %}">Dashboard</a>
+        <i class="fas fa-chevron-right"></i>
+        <span style="color:#fbbf24;">{{ classroom.class_grade }} — {{ classroom.section }}</span>
+    </div>
+</nav>
+
+<div id="ct-page">
+
+    {# ── HERO ── #}
+    <div class="ct-hero mb-4">
+        <div class="ct-hero-inner">
+            <div class="ct-label">Class Teacher Dashboard</div>
+            <h1 class="ct-title">{{ classroom.class_grade }} — {{ classroom.section }}</h1>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="ct-pill"><i class="fas fa-school"></i> {{ school.name }}</span>
+                <span class="ct-pill"><i class="fas fa-users"></i> {{ students.count }} student{{ students.count|pluralize }}</span>
+                <span class="ct-pill"><i class="fas fa-book-open"></i> {{ assignments.count }} subject{{ assignments.count|pluralize }}</span>
+                <span class="ct-pill"><i class="fas fa-star"></i> Class Teacher</span>
+            </div>
+        </div>
+    </div>
+
+    {# ── STATS ── #}
+    <div class="ct-stats mb-4">
+        <div class="ct-stat">
+            <div class="ct-stat-icon si-gold"><i class="fas fa-book-open"></i></div>
+            <div><div class="ct-stat-num">{{ assignments.count }}</div><div class="ct-stat-lbl">Subjects</div></div>
+        </div>
+        <div class="ct-stat">
+            <div class="ct-stat-icon si-blue"><i class="fas fa-users"></i></div>
+            <div><div class="ct-stat-num">{{ students.count }}</div><div class="ct-stat-lbl">Students</div></div>
+        </div>
+        <div class="ct-stat">
+            <div class="ct-stat-icon si-green"><i class="fas fa-file-alt"></i></div>
+            <div><div class="ct-stat-num">{{ exams.count }}</div><div class="ct-stat-lbl">Exams</div></div>
+        </div>
+        <div class="ct-stat">
+            <div class="ct-stat-icon si-purple"><i class="fas fa-chalkboard-teacher"></i></div>
+            <div>
+                <div class="ct-stat-num" style="font-size:1rem;line-height:1.3;">
+                    {{ classroom.class_grade }}
+                </div>
+                <div class="ct-stat-lbl">Grade Level</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── SUBJECT ASSIGNMENTS ── #}
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div class="ct-heading" style="margin-bottom:0;flex:1;">
+            <span class="ch-icon"><i class="fas fa-book-open"></i></span>
+            Subject Assignments
+        </div>
+        <a href="{% url 'teachers:assign_subject' classroom.id %}" class="ctbtn ctbtn-gold">
+            <i class="fas fa-plus"></i> Assign Subject
+        </a>
+    </div>
+
+    {% if assignments %}
+    <div class="row g-3 mb-4">
+        {% for assignment in assignments %}
+        <div class="col-sm-6 col-lg-4">
+            <div class="ct-assign-card">
+                <div class="ct-assign-top">
+                    {% if assignment.subject.code %}
+                    <div style="display:inline-block;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);color:#fbbf24;border-radius:6px;padding:.18rem .6rem;font-size:.68rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:.6rem;">
+                        {{ assignment.subject.code }}
+                    </div>
+                    {% endif %}
+                    <h5 class="ct-assign-subject">{{ assignment.subject.name }}</h5>
+                    <div class="ct-assign-teacher">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        {{ assignment.teacher.user.get_full_name|default:"Unassigned" }}
+                    </div>
+                </div>
+                <div class="ct-assign-actions">
+                    <a href="{% url 'teachers:subject_exams' assignment.id %}" class="ctbtn ctbtn-blue ctbtn-sm">
+                        <i class="fas fa-file-alt"></i> Exams &amp; Results
+                    </a>
+                    <a href="{% url 'teachers:subject_students' assignment.id %}" class="ctbtn ctbtn-ghost ctbtn-sm">
+                        <i class="fas fa-users"></i> Students
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="ct-card mb-4">
+        <div class="ct-empty">
+            <i class="fas fa-book-open"></i>
+            <p>No subjects assigned yet. Use the <strong>Assign Subject</strong> button above.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="ct-sep"></div>
+
+    {# ── STUDENTS IN THIS CLASSROOM ── #}
+    <div class="ct-heading">
+        <span class="ch-icon"><i class="fas fa-users"></i></span>
+        Students in {{ classroom }}
+    </div>
+
+    <div class="ct-card">
+        <div class="ct-card-head">
+            <span class="ch-icon"><i class="fas fa-user-graduate"></i></span>
+            <h6>Student List</h6>
+            <small>{{ students.count }} student{{ students.count|pluralize }}</small>
+        </div>
+        {% if students %}
+        <div style="overflow-x:auto;">
+        <table class="ct-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Adm No</th>
+                    <th>Gender</th>
+                    <th>Boarding</th>
+                    <th>Results</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td style="color:#334155;">{{ forloop.counter }}</td>
+                    <td class="td-name">{{ student.first_name }} {{ student.last_name }}</td>
+                    <td style="font-family:monospace;font-size:.76rem;color:#475569;">{{ student.admission_no }}</td>
+                    <td>
+                        <span class="ct-badge {% if student.gender == 'male' %}badge-blue{% else %}badge-gold{% endif %}">
+                            {{ student.gender|default:"—" }}
+                        </span>
+                    </td>
+                    <td style="font-size:.78rem;color:#64748b;">{{ student.get_is_boarder_display|default:"—" }}</td>
+                    <td>
+                        <a href="{% url 'exams:student_results' student.id %}" class="ctbtn ctbtn-ghost ctbtn-sm">
+                            <i class="fas fa-chart-bar"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <div class="ct-empty"><i class="fas fa-users"></i><p>No students in this classroom yet.</p></div>
+        {% endif %}
+    </div>
+
+    {# ── EXAMS ── #}
+    <div class="ct-sep"></div>
+    <div class="ct-heading">
+        <span class="ch-icon"><i class="fas fa-file-alt"></i></span>
+        Exams
+        <a href="{% url 'exams:exam_create' %}" style="margin-left:auto;font-size:.78rem;font-weight:600;color:#fbbf24;text-decoration:none;display:flex;align-items:center;gap:.4rem;">
+            <i class="fas fa-plus"></i> Create Exam
+        </a>
+    </div>
+
+    <div class="ct-card">
+        <div class="ct-card-head">
+            <span class="ch-icon"><i class="fas fa-file-alt"></i></span>
+            <h6>All Exams</h6>
+            <small>{{ exams.count }} exam{{ exams.count|pluralize }}</small>
+        </div>
+        {% if exams %}
+        <div style="overflow-x:auto;">
+        <table class="ct-table">
+            <thead><tr><th>#</th><th>Name</th><th>Type</th><th>Term</th><th>Year</th><th>Ranking</th></tr></thead>
+            <tbody>
+                {% for exam in exams %}
+                <tr>
+                    <td style="color:#334155;">{{ forloop.counter }}</td>
+                    <td class="td-name">{{ exam.name }}</td>
+                    <td>{% if exam.exam_type %}<span class="ct-badge badge-blue">{{ exam.exam_type }}</span>{% else %}<span style="color:#334155;">—</span>{% endif %}</td>
+                    <td>{{ exam.term }}</td>
+                    <td>{{ exam.year }}</td>
+                    <td>
+                        <a href="{% url 'exams:class_ranking' exam.id %}" class="ctbtn ctbtn-ghost ctbtn-sm">
+                            <i class="fas fa-trophy"></i> Ranking
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <div class="ct-empty"><i class="fas fa-file-alt"></i><p>No exams yet.</p></div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

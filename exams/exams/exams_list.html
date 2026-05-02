@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Exams</h2>
+
+    <a href="{% url 'exams_add' %}" class="btn btn-primary mb-3">+ Add Exam</a>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Exam Type</th>
+                <th>Subject</th>
+                <th>Class</th>
+                <th>Term</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for e in exams %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ e.exam_type }}</td>
+                <td>{{ e.subject }}</td>
+                <td>{{ e.class_level }}</td>
+                <td>{{ e.term }}</td>
+                <td>{{ e.date }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No exams added yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

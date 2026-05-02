@@ -1,0 +1,815 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+    --bg:#F5F7FB;--surface:#fff;--border:#E4E8F1;
+    --accent:#3B5BDB;--accent-soft:#EEF2FF;--accent-border:#C7D2FE;
+    --green:#0CA678;--green-soft:#EBFBF2;--green-border:#6EE7CA;
+    --red:#DC2626;--red-soft:#FEF2F2;--amber:#D97706;
+    --text:#1A1D2E;--muted:#6B7280;--hint:#9CA3AF;
+    --font:'DM Sans',sans-serif;--display:'Syne',sans-serif;
+    --radius:12px;
+    --shadow:0 1px 3px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.04);
+    --shadow-lg:0 8px 30px rgba(0,0,0,.12);
+}
+
+body{font-family:var(--font)}
+
+/* ── PAGE ── */
+.gm-page{background:var(--bg);min-height:100vh;padding:2.5rem 2rem;font-family:var(--font);color:var(--text)}
+
+/* ── HEADER ── */
+.gm-header{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem}
+.gm-eyebrow{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.gm-title{font-family:var(--display);font-size:1.85rem;line-height:1.2}
+.gm-title span{color:var(--accent)}
+.gm-back{display:inline-flex;align-items:center;gap:6px;font-size:.83rem;font-weight:600;color:var(--muted);text-decoration:none;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);transition:background .15s,color .15s}
+.gm-back:hover{background:#F1F5F9;color:var(--text)}
+.gm-back svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── GRID ── */
+.gm-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:860px){.gm-grid{grid-template-columns:1fr}}
+
+/* ── CARD ── */
+.gm-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.gm-card-strip{height:4px}
+.gm-card-strip.blue{background:linear-gradient(90deg,var(--accent),#818CF8)}
+.gm-card-strip.green{background:linear-gradient(90deg,var(--green),#34D399)}
+
+/* ── CARD TOOLBAR ── */
+.gm-toolbar{padding:1.1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap}
+.gm-toolbar-left{display:flex;align-items:center;gap:10px}
+.gm-icon-box{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.gm-icon-box.blue{background:var(--accent-soft)}
+.gm-icon-box.blue svg{stroke:var(--accent)}
+.gm-icon-box.green{background:var(--green-soft)}
+.gm-icon-box.green svg{stroke:var(--green)}
+.gm-icon-box svg{width:15px;height:15px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gm-toolbar-title{font-weight:600;font-size:.93rem;color:var(--text)}
+.gm-toolbar-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.gm-count-badge{font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border)}
+.gm-count-badge.green{background:var(--green-soft);color:var(--green);border-color:var(--green-border)}
+
+/* ── SEARCH ── */
+.gm-search{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:8px;padding:6px 11px;background:#FAFBFF;flex:1;max-width:200px}
+.gm-search svg{width:13px;height:13px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.gm-search input{border:none;background:none;outline:none;font-family:var(--font);font-size:.82rem;color:var(--text);width:100%}
+.gm-search input::placeholder{color:var(--hint)}
+
+/* ── BTN ── */
+.gm-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:background .15s,transform .1s}
+.gm-btn:active{transform:scale(.97)}
+.gm-btn svg{width:13px;height:13px;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.gm-btn-blue{background:var(--accent);color:#fff}.gm-btn-blue:hover{background:#2F4AC2}.gm-btn-blue svg{stroke:#fff}
+.gm-btn-green{background:var(--green);color:#fff}.gm-btn-green:hover{background:#089669}.gm-btn-green svg{stroke:#fff}
+.gm-btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.gm-btn-outline:hover{background:#F5F7FB}
+
+/* ── LIST ── */
+.gm-list{flex:1;overflow-y:auto;max-height:520px}
+.gm-empty{padding:3rem;text-align:center;color:var(--muted);font-size:.875rem}
+.gm-empty svg{width:32px;height:32px;stroke:var(--border);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto .75rem}
+
+/* ── ROW ── */
+.gm-row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #F1F5F9;transition:background .15s}
+.gm-row:last-child{border-bottom:none}
+.gm-row:hover{background:#FAFBFF}
+.gm-row.editing{background:#F7F9FF}
+.gm-row.deleting{opacity:0;transition:opacity .3s}
+
+.gm-row-num{font-size:.75rem;color:var(--hint);font-weight:600;min-width:22px;text-align:right;flex-shrink:0}
+.gm-row-name{flex:1;font-size:.875rem;color:var(--text);font-weight:500}
+.gm-row-sub{font-size:11px;color:var(--muted);margin-top:1px}
+
+/* inline edit input */
+.gm-inline-input{flex:1;padding:6px 10px;border:1.5px solid var(--accent);border-radius:6px;font-family:var(--font);font-size:.875rem;color:var(--text);outline:none;background:var(--accent-soft);display:none}
+.gm-inline-input:focus{box-shadow:0 0 0 3px rgba(59,91,219,.1)}
+.gm-row.editing .gm-row-name{display:none}
+.gm-row.editing .gm-inline-input{display:block}
+
+/* action buttons */
+.gm-row-actions{display:flex;gap:4px;flex-shrink:0}
+.gm-act-btn{width:28px;height:28px;border-radius:6px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,transform .1s}
+.gm-act-btn:active{transform:scale(.9)}
+.gm-act-btn svg{width:12px;height:12px;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.gm-act-btn.edit{background:var(--accent-soft)}.gm-act-btn.edit svg{stroke:var(--accent)}.gm-act-btn.edit:hover{background:#D4DEFF}
+.gm-act-btn.save{background:var(--green-soft);display:none}.gm-act-btn.save svg{stroke:var(--green)}.gm-act-btn.save:hover{background:#C3F9E9}
+.gm-act-btn.cancel{background:#F1F5F9;display:none}.gm-act-btn.cancel svg{stroke:var(--muted)}.gm-act-btn.cancel:hover{background:#E2E8F0}
+.gm-act-btn.del{background:var(--red-soft)}.gm-act-btn.del svg{stroke:var(--red)}.gm-act-btn.del:hover{background:#FEE2E2}
+.gm-row.editing .gm-act-btn.edit{display:none}
+.gm-row.editing .gm-act-btn.save,.gm-row.editing .gm-act-btn.cancel{display:flex}
+
+/* sections badge inside grade row */
+.gm-sec-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--green-soft);color:var(--green);border:1px solid var(--green-border);flex-shrink:0;white-space:nowrap}
+.gm-sec-badge.zero{background:#F1F5F9;color:var(--muted);border-color:var(--border)}
+
+/* grade filter bar (sections panel) */
+.gm-filter-bar{padding:.75rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#FAFBFF}
+.gm-filter-label{font-size:.8rem;font-weight:600;color:var(--muted);flex-shrink:0}
+.gm-grade-pill{padding:5px 12px;border-radius:999px;font-size:.78rem;font-weight:600;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.gm-grade-pill:hover{border-color:var(--accent-border);color:var(--accent);background:var(--accent-soft)}
+.gm-grade-pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.gm-grade-pill.all{border-color:var(--border)}
+
+/* ── MODAL ── */
+#gmOverlay{position:fixed;inset:0;background:rgba(15,17,30,.45);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:10001;opacity:0;pointer-events:none;transition:opacity .24s ease}
+#gmOverlay.open{opacity:1;pointer-events:auto}
+#gmModal{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.2);padding:2rem;max-width:400px;width:90%;transform:scale(.94) translateY(8px);transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+#gmOverlay.open #gmModal{transform:scale(1) translateY(0)}
+.gm-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.gm-modal-title{font-family:var(--display);font-size:1.15rem;color:var(--text)}
+.gm-modal-close{width:28px;height:28px;border-radius:6px;border:none;background:#F1F5F9;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;line-height:1}
+.gm-modal-close:hover{background:#E2E8F0;color:var(--text)}
+.gm-modal-body{display:flex;flex-direction:column;gap:1rem}
+.gm-field label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase}
+.gm-field input,.gm-field select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font);font-size:.875rem;color:var(--text);outline:none;transition:border .18s,box-shadow .18s;background:#FAFBFF}
+.gm-field input:focus,.gm-field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,91,219,.08);background:#fff}
+.gm-field input.error{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.08)}
+.gm-field-error{font-size:.8rem;color:var(--red);font-weight:500;margin-top:4px;display:none}
+.gm-field-error.show{display:block}
+.gm-modal-footer{display:flex;gap:.75rem;margin-top:1.5rem}
+.gm-modal-footer .gm-btn{flex:1;justify-content:center;padding:10px}
+
+/* ── CONFIRM DELETE MODAL ── */
+#gmDelOverlay{position:fixed;inset:0;background:rgba(15,17,30,.45);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:10002;opacity:0;pointer-events:none;transition:opacity .24s ease}
+#gmDelOverlay.open{opacity:1;pointer-events:auto}
+#gmDelModal{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.2);padding:2rem 2rem 1.75rem;max-width:360px;width:90%;transform:scale(.94) translateY(8px);transition:transform .25s cubic-bezier(.34,1.56,.64,1);text-align:center}
+#gmDelOverlay.open #gmDelModal{transform:scale(1) translateY(0)}
+.gdm-icon{width:52px;height:52px;background:var(--red-soft);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+.gdm-icon svg{width:22px;height:22px;fill:none;stroke:var(--red);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gdm-title{font-family:var(--display);font-size:1.1rem;margin-bottom:.4rem}
+.gdm-body{font-size:.875rem;color:var(--muted);line-height:1.55;margin-bottom:1.4rem}
+.gdm-body strong{color:var(--text)}
+.gdm-actions{display:flex;gap:.75rem}
+.gdm-btn{flex:1;padding:9px;border-radius:8px;border:none;font-family:var(--font);font-size:.875rem;font-weight:600;cursor:pointer;transition:background .18s}
+.gdm-btn.cancel{background:#F1F5F9;color:var(--muted)}.gdm-btn.cancel:hover{background:#E2E8F0;color:var(--text)}
+.gdm-btn.confirm{background:var(--red);color:#fff}.gdm-btn.confirm:hover{background:#B91C1C}
+
+/* ── TOAST ── */
+#gmToast{position:fixed;top:1.5rem;left:50%;transform:translateX(-50%) translateY(-14px);min-width:300px;max-width:460px;padding:.85rem 1.1rem;border-radius:12px;font-family:var(--font);font-size:.875rem;font-weight:500;display:flex;align-items:center;gap:10px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.14);opacity:0;pointer-events:none;z-index:10000;transition:opacity .28s ease,transform .28s ease}
+#gmToast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+#gmToast.success{border-top:4px solid var(--green)}
+#gmToast.error{border-top:4px solid var(--red)}
+#gmToast.warning{border-top:4px solid var(--amber)}
+#gmToast .ti{width:17px;height:17px;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+#gmToast.success .ti{stroke:var(--green)}
+#gmToast.error .ti{stroke:var(--red)}
+#gmToast.warning .ti{stroke:var(--amber)}
+#gmToast .tm{flex:1;color:var(--text)}
+#gmToast .tc{background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:2px 4px;border-radius:4px}
+#gmToast .tc:hover{color:var(--text);background:#F1F5F9}
+</style>
+
+<div class="gm-page">
+
+    
+    <div class="gm-header">
+        <div>
+            <div class="gm-eyebrow">{{ school.name }} &mdash; Academics</div>
+            <div class="gm-title">Grades &amp; <span>Streams</span></div>
+        </div>
+        <a href="{% url 'students:manage_grades' school.id %}" class="gm-back" style="visibility:hidden">
+            
+        </a>
+    </div>
+
+    <div class="gm-grid">
+
+        
+        <div class="gm-card" id="gradesCard">
+            <div class="gm-card-strip blue"></div>
+            <div class="gm-toolbar">
+                <div class="gm-toolbar-left">
+                    <div class="gm-icon-box blue">
+                        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
+                    <div>
+                        <div class="gm-toolbar-title">Class Grades</div>
+                        <div class="gm-toolbar-sub">Year / level groups</div>
+                    </div>
+                    <span class="gm-count-badge" id="gradeCountBadge">{{ grades|length }}</span>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <div class="gm-search">
+                        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" placeholder="Search grades…" oninput="gmFilterGrades(this.value)">
+                    </div>
+                    <button class="gm-btn gm-btn-blue" onclick="gmOpenModal('grade')">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                        Add Grade
+                    </button>
+                </div>
+            </div>
+
+            <div class="gm-list" id="gradesList">
+                {% for grade in grades %}
+                <div class="gm-row" data-id="{{ grade.id }}" data-name="{{ grade.name|escapejs }}" data-sec-count="{{ grade.sections.count }}">
+                    <span class="gm-row-num">{{ forloop.counter|stringformat:"02d" }}</span>
+                    <div style="flex:1;min-width:0">
+                        <div class="gm-row-name">{{ grade.name }}</div>
+                        <input class="gm-inline-input" type="text" value="{{ grade.name|escapejs }}" placeholder="Grade name">
+                    </div>
+                    <span class="gm-sec-badge {% if grade.sections.count == 0 %}zero{% endif %}">
+                        {{ grade.sections.count }} stream{{ grade.sections.count|pluralize }}
+                    </span>
+                    <div class="gm-row-actions">
+                        <button class="gm-act-btn edit"   title="Edit"   onclick="gmStartEdit(this)"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                        <button class="gm-act-btn save"   title="Save"   onclick="gmSaveGrade(this)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>
+                        <button class="gm-act-btn cancel" title="Cancel" onclick="gmCancelEdit(this)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                        <button class="gm-act-btn del"    title="Delete" onclick="gmConfirmDelete('grade',this)"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="gm-empty" id="gradesEmpty">
+                    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    No grades yet — click <strong>Add Grade</strong> to get started.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        
+        <div class="gm-card" id="sectionsCard">
+            <div class="gm-card-strip green"></div>
+            <div class="gm-toolbar">
+                <div class="gm-toolbar-left">
+                    <div class="gm-icon-box green">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    </div>
+                    <div>
+                        <div class="gm-toolbar-title">Streams / Sections</div>
+                        <div class="gm-toolbar-sub">Divisions within a grade</div>
+                    </div>
+                    <span class="gm-count-badge green" id="secCountBadge">{{ total_sections }}</span>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <div class="gm-search">
+                        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" placeholder="Search streams…" oninput="gmFilterSections(this.value)">
+                    </div>
+                    <button class="gm-btn gm-btn-green" onclick="gmOpenModal('section')">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                        Add Stream
+                    </button>
+                </div>
+            </div>
+
+            
+            <div class="gm-filter-bar" id="gradeFilterBar">
+                <span class="gm-filter-label">Filter:</span>
+                <button class="gm-grade-pill all active" data-grade-id="all" onclick="gmFilterByGrade('all',this)">All grades</button>
+                {% for grade in grades %}
+                <button class="gm-grade-pill" data-grade-id="{{ grade.id }}" onclick="gmFilterByGrade('{{ grade.id }}',this)">{{ grade.name }}</button>
+                {% endfor %}
+            </div>
+
+            <div class="gm-list" id="sectionsList">
+                {% for grade in grades %}
+                    {% for section in grade.sections.all %}
+                    <div class="gm-row" data-id="{{ section.id }}" data-name="{{ section.name|escapejs }}" data-grade-id="{{ grade.id }}" data-grade-name="{{ grade.name|escapejs }}">
+                        <span class="gm-row-num">--</span>
+                        <div style="flex:1;min-width:0">
+                            <div class="gm-row-name">{{ section.name }}</div>
+                            <div class="gm-row-sub">{{ grade.name }}</div>
+                            <input class="gm-inline-input" type="text" value="{{ section.name|escapejs }}" placeholder="Stream name">
+                        </div>
+                        <div class="gm-row-actions">
+                            <button class="gm-act-btn edit"   title="Edit"   onclick="gmStartEdit(this)"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                            <button class="gm-act-btn save"   title="Save"   onclick="gmSaveSection(this)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button>
+                            <button class="gm-act-btn cancel" title="Cancel" onclick="gmCancelEdit(this)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                            <button class="gm-act-btn del"    title="Delete" onclick="gmConfirmDelete('section',this)"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endfor %}
+                <div class="gm-empty" id="sectionsEmpty">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    No streams yet — add a grade first, then add streams.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="gmOverlay">
+    <div id="gmModal">
+        <div class="gm-modal-header">
+            <div class="gm-modal-title" id="gmModalTitle">Add Grade</div>
+            <button class="gm-modal-close" onclick="gmCloseModal()">&#10005;</button>
+        </div>
+        <div class="gm-modal-body">
+            <div class="gm-field" id="gmGradeSelectField" style="display:none">
+                <label>Grade</label>
+                <select id="gmGradeSelect">
+                    <option value="">— choose a grade —</option>
+                    {% for grade in grades %}
+                    <option value="{{ grade.id }}">{{ grade.name }}</option>
+                    {% endfor %}
+                </select>
+                <div class="gm-field-error" id="gmGradeSelectErr"></div>
+            </div>
+            <div class="gm-field">
+                <label id="gmNameLabel">Grade name</label>
+                <input type="text" id="gmNameInput" placeholder="e.g. Form 1">
+                <div class="gm-field-error" id="gmNameErr"></div>
+            </div>
+        </div>
+        <div class="gm-modal-footer">
+            <button class="gm-btn gm-btn-outline" onclick="gmCloseModal()">Cancel</button>
+            <button class="gm-btn gm-btn-blue" id="gmSaveBtn" onclick="gmModalSave()">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div id="gmDelOverlay">
+    <div id="gmDelModal">
+        <div class="gdm-icon">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </div>
+        <div class="gdm-title" id="gdmTitle">Delete?</div>
+        <div class="gdm-body" id="gdmBody"></div>
+        <div class="gdm-actions">
+            <button class="gdm-btn cancel" onclick="gmCloseDelModal()">Cancel</button>
+            <button class="gdm-btn confirm" id="gdmConfirmBtn">Yes, delete</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="gmToast">
+    <svg class="ti" viewBox="0 0 24 24" id="gmToastIcon"></svg>
+    <span class="tm" id="gmToastMsg"></span>
+    <button class="tc" onclick="gmHideToast()">&#10005;</button>
+</div>
+
+<script>
+var SCHOOL_ID = {{ school.id }};
+
+/* ── URL helpers ── */
+var URLS = {
+    gradeCreate:   '/students/grades/create/' + SCHOOL_ID + '/',
+    gradeUpdate:   function(id){ return '/students/grades/' + id + '/update/'; },
+    gradeDelete:   function(id){ return '/students/grades/' + id + '/delete/'; },
+    secCreate:     function(gradeId){ return '/students/sections/create/' + gradeId + '/'; },
+    secUpdate:     function(id){ return '/students/sections/' + id + '/update/'; },
+    secDelete:     function(id){ return '/students/sections/' + id + '/delete/'; },
+};
+
+function getCsrf(){
+    var c = document.cookie.split('; ').find(function(s){return s.startsWith('csrftoken=');});
+    return c ? c.split('=')[1] : '';
+}
+
+function api(url, body){
+    return fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','X-CSRFToken':getCsrf()},
+        body: JSON.stringify(body)
+    }).then(function(r){return r.json();});
+}
+
+/* ════════════════════════════════════════
+   GRADE LIST HELPERS
+════════════════════════════════════════ */
+function gmRefreshGradeNums(){
+    var i = 1;
+    document.querySelectorAll('#gradesList .gm-row').forEach(function(r){
+        if(r.style.display==='none') return;
+        var n = r.querySelector('.gm-row-num'); if(n) n.textContent = String(i++).padStart(2,'0');
+    });
+}
+
+function gmRefreshSecNums(){
+    var i = 1;
+    document.querySelectorAll('#sectionsList .gm-row').forEach(function(r){
+        if(r.style.display==='none') return;
+        var n = r.querySelector('.gm-row-num'); if(n) n.textContent = String(i++).padStart(2,'0');
+    });
+}
+
+function gmUpdateGradeCount(){
+    var n = document.querySelectorAll('#gradesList .gm-row').length;
+    document.getElementById('gradeCountBadge').textContent = n;
+}
+
+function gmUpdateSecCount(){
+    var n = document.querySelectorAll('#sectionsList .gm-row').length;
+    document.getElementById('secCountBadge').textContent = n;
+}
+
+function gmCheckEmpty(listId, emptyId){
+    var rows = document.querySelectorAll('#' + listId + ' .gm-row');
+    document.getElementById(emptyId).style.display = rows.length ? 'none' : '';
+}
+
+/* ════════════════════════════════════════
+   INLINE EDIT
+════════════════════════════════════════ */
+function gmStartEdit(btn){
+    var row = btn.closest('.gm-row');
+    row.classList.add('editing');
+    var inp = row.querySelector('.gm-inline-input');
+    inp.value = row.dataset.name;
+    inp.focus(); inp.select();
+}
+
+function gmCancelEdit(btn){
+    btn.closest('.gm-row').classList.remove('editing');
+}
+
+/* Enter key submits inline edit */
+document.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter') return;
+    var inp = e.target;
+    if(!inp.classList.contains('gm-inline-input')) return;
+    var row = inp.closest('.gm-row');
+    var saveBtn = row.querySelector('.gm-act-btn.save');
+    if(saveBtn) saveBtn.click();
+});
+
+/* ── Save grade inline ── */
+function gmSaveGrade(btn){
+    var row  = btn.closest('.gm-row');
+    var id   = row.dataset.id;
+    var inp  = row.querySelector('.gm-inline-input');
+    var name = inp.value.trim();
+    if(!name){ gmShowToast('Grade name cannot be empty.','error'); return; }
+
+    api(URLS.gradeUpdate(id), {name:name}).then(function(res){
+        if(res.success){
+            row.dataset.name = res.name;
+            row.querySelector('.gm-row-name').textContent = res.name;
+            inp.value = res.name;
+            row.classList.remove('editing');
+            /* sync grade pill + modal select */
+            gmSyncGradePill(id, res.name);
+            gmSyncModalGradeOption(id, res.name);
+            gmShowToast('"' + res.name + '" updated.', 'success');
+        } else {
+            gmShowToast(res.error || 'Could not update.','error');
+        }
+    }).catch(function(){ gmShowToast('Network error.','error'); });
+}
+
+/* ── Save section inline ── */
+function gmSaveSection(btn){
+    var row  = btn.closest('.gm-row');
+    var id   = row.dataset.id;
+    var inp  = row.querySelector('.gm-inline-input');
+    var name = inp.value.trim();
+    if(!name){ gmShowToast('Stream name cannot be empty.','error'); return; }
+
+    api(URLS.secUpdate(id), {name:name}).then(function(res){
+        if(res.success){
+            row.dataset.name = res.name;
+            row.querySelector('.gm-row-name').textContent = res.name;
+            inp.value = res.name;
+            row.classList.remove('editing');
+            gmShowToast('"' + res.name + '" updated.', 'success');
+        } else {
+            gmShowToast(res.error || 'Could not update.','error');
+        }
+    }).catch(function(){ gmShowToast('Network error.','error'); });
+}
+
+/* ════════════════════════════════════════
+   FILTER
+════════════════════════════════════════ */
+function gmFilterGrades(q){
+    var term = q.toLowerCase();
+    document.querySelectorAll('#gradesList .gm-row').forEach(function(r){
+        r.style.display = r.dataset.name.toLowerCase().includes(term) ? '' : 'none';
+    });
+    gmRefreshGradeNums();
+}
+
+var _activeGradeFilter = 'all';
+
+function gmFilterByGrade(gradeId, btn){
+    _activeGradeFilter = gradeId;
+    document.querySelectorAll('.gm-grade-pill').forEach(function(p){p.classList.remove('active');});
+    btn.classList.add('active');
+    document.querySelectorAll('#sectionsList .gm-row').forEach(function(r){
+        r.style.display = (gradeId === 'all' || r.dataset.gradeId === String(gradeId)) ? '' : 'none';
+    });
+    gmRefreshSecNums();
+}
+
+function gmFilterSections(q){
+    var term = q.toLowerCase();
+    document.querySelectorAll('#sectionsList .gm-row').forEach(function(r){
+        var inFilter = (_activeGradeFilter==='all' || r.dataset.gradeId===String(_activeGradeFilter));
+        var inSearch = r.dataset.name.toLowerCase().includes(term) || r.dataset.gradeName.toLowerCase().includes(term);
+        r.style.display = (inFilter && inSearch) ? '' : 'none';
+    });
+    gmRefreshSecNums();
+}
+
+/* ════════════════════════════════════════
+   CREATE MODAL
+════════════════════════════════════════ */
+var _modalMode = 'grade'; /* 'grade' | 'section' */
+
+function gmOpenModal(mode){
+    _modalMode = mode;
+    var isSection = mode === 'section';
+    document.getElementById('gmModalTitle').textContent  = isSection ? 'Add Stream' : 'Add Grade';
+    document.getElementById('gmNameLabel').textContent   = isSection ? 'Stream name' : 'Grade name';
+    document.getElementById('gmNameInput').placeholder   = isSection ? 'e.g. East' : 'e.g. Form 1';
+    document.getElementById('gmNameInput').value         = '';
+    document.getElementById('gmGradeSelectField').style.display = isSection ? '' : 'none';
+    document.getElementById('gmGradeSelect').value       = '';
+    document.getElementById('gmSaveBtn').className       = 'gm-btn ' + (isSection ? 'gm-btn-green' : 'gm-btn-blue');
+    document.getElementById('gmNameErr').classList.remove('show');
+    document.getElementById('gmGradeSelectErr').classList.remove('show');
+    document.getElementById('gmNameInput').classList.remove('error');
+    document.getElementById('gmGradeSelect').classList.remove('error');
+    document.getElementById('gmOverlay').classList.add('open');
+    setTimeout(function(){ document.getElementById('gmNameInput').focus(); }, 260);
+}
+
+function gmCloseModal(){
+    document.getElementById('gmOverlay').classList.remove('open');
+}
+
+document.getElementById('gmOverlay').addEventListener('click', function(e){
+    if(e.target === this) gmCloseModal();
+});
+
+document.getElementById('gmNameInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') gmModalSave();
+});
+
+function gmModalSave(){
+    var name = document.getElementById('gmNameInput').value.trim();
+    var errEl = document.getElementById('gmNameErr');
+    var inp   = document.getElementById('gmNameInput');
+
+    /* clear */
+    errEl.classList.remove('show'); inp.classList.remove('error');
+    document.getElementById('gmGradeSelectErr').classList.remove('show');
+    document.getElementById('gmGradeSelect').classList.remove('error');
+
+    if(!name){
+        errEl.textContent = (_modalMode==='section' ? 'Stream' : 'Grade') + ' name is required.';
+        errEl.classList.add('show'); inp.classList.add('error'); inp.focus(); return;
+    }
+
+    if(_modalMode === 'grade'){
+        api(URLS.gradeCreate, {name:name}).then(function(res){
+            if(res.success){
+                gmCloseModal();
+                gmAddGradeRow(res);
+                gmAddGradePill(res);
+                gmAddModalGradeOption(res);
+                gmUpdateGradeCount();
+                gmCheckEmpty('gradesList','gradesEmpty');
+                gmRefreshGradeNums();
+                gmShowToast('"' + res.name + '" created.','success');
+            } else {
+                errEl.textContent = res.error; errEl.classList.add('show'); inp.classList.add('error');
+            }
+        }).catch(function(){ gmShowToast('Network error.','error'); });
+
+    } else {
+        var gradeId  = document.getElementById('gmGradeSelect').value;
+        var gradeErr = document.getElementById('gmGradeSelectErr');
+        var gradeSel = document.getElementById('gmGradeSelect');
+        if(!gradeId){
+            gradeErr.textContent='Please select a grade.'; gradeErr.classList.add('show');
+            gradeSel.classList.add('error'); return;
+        }
+        var gradeName = gradeSel.options[gradeSel.selectedIndex].text;
+
+        api(URLS.secCreate(gradeId), {name:name}).then(function(res){
+            if(res.success){
+                gmCloseModal();
+                gmAddSectionRow(res, gradeName);
+                gmUpdateSecCount();
+                gmCheckEmpty('sectionsList','sectionsEmpty');
+                gmRefreshSecNums();
+                /* update streams badge on grade row */
+                gmIncrGradeSecCount(gradeId, 1);
+                gmShowToast('"' + res.name + '" added to ' + gradeName + '.','success');
+            } else {
+                errEl.textContent = res.error; errEl.classList.add('show'); inp.classList.add('error');
+            }
+        }).catch(function(){ gmShowToast('Network error.','error'); });
+    }
+}
+
+/* ════════════════════════════════════════
+   DOM BUILDERS
+════════════════════════════════════════ */
+function gmMakeActBtns(type){
+    var editSvg   = '<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    var saveSvg   = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+    var cancelSvg = '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    var delSvg    = '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
+    var saveFunc  = type==='grade' ? 'gmSaveGrade(this)' : 'gmSaveSection(this)';
+    return '<div class="gm-row-actions">' +
+        '<button class="gm-act-btn edit"   title="Edit"   onclick="gmStartEdit(this)">'   + editSvg   + '</button>' +
+        '<button class="gm-act-btn save"   title="Save"   onclick="' + saveFunc + '">'    + saveSvg   + '</button>' +
+        '<button class="gm-act-btn cancel" title="Cancel" onclick="gmCancelEdit(this)">'  + cancelSvg + '</button>' +
+        '<button class="gm-act-btn del"    title="Delete" onclick="gmConfirmDelete(\'' + type + '\',this)">' + delSvg + '</button>' +
+        '</div>';
+}
+
+function gmAddGradeRow(res){
+    var list = document.getElementById('gradesList');
+    var div  = document.createElement('div');
+    div.className = 'gm-row';
+    div.dataset.id = res.id; div.dataset.name = res.name; div.dataset.secCount = '0';
+    div.innerHTML =
+        '<span class="gm-row-num">--</span>' +
+        '<div style="flex:1;min-width:0">' +
+            '<div class="gm-row-name">' + gmEsc(res.name) + '</div>' +
+            '<input class="gm-inline-input" type="text" value="' + gmEsc(res.name) + '" placeholder="Grade name">' +
+        '</div>' +
+        '<span class="gm-sec-badge zero">0 streams</span>' +
+        gmMakeActBtns('grade');
+    list.appendChild(div);
+}
+
+function gmAddSectionRow(res, gradeName){
+    var list = document.getElementById('sectionsList');
+    var div  = document.createElement('div');
+    div.className = 'gm-row';
+    div.dataset.id = res.id; div.dataset.name = res.name;
+    div.dataset.gradeId = res.grade_id; div.dataset.gradeName = gradeName;
+    div.innerHTML =
+        '<span class="gm-row-num">--</span>' +
+        '<div style="flex:1;min-width:0">' +
+            '<div class="gm-row-name">' + gmEsc(res.name) + '</div>' +
+            '<div class="gm-row-sub">' + gmEsc(gradeName) + '</div>' +
+            '<input class="gm-inline-input" type="text" value="' + gmEsc(res.name) + '" placeholder="Stream name">' +
+        '</div>' +
+        gmMakeActBtns('section');
+    list.appendChild(div);
+}
+
+function gmAddGradePill(res){
+    var bar = document.getElementById('gradeFilterBar');
+    var btn = document.createElement('button');
+    btn.className = 'gm-grade-pill';
+    btn.dataset.gradeId = res.id;
+    btn.textContent = res.name;
+    btn.setAttribute('onclick', 'gmFilterByGrade("' + res.id + '",this)');
+    bar.appendChild(btn);
+}
+
+function gmAddModalGradeOption(res){
+    var sel = document.getElementById('gmGradeSelect');
+    var opt = document.createElement('option');
+    opt.value = res.id; opt.textContent = res.name;
+    sel.appendChild(opt);
+}
+
+function gmSyncGradePill(id, name){
+    var pill = document.querySelector('.gm-grade-pill[data-grade-id="' + id + '"]');
+    if(pill) pill.textContent = name;
+}
+
+function gmSyncModalGradeOption(id, name){
+    var sel = document.getElementById('gmGradeSelect');
+    var opt = sel.querySelector('option[value="' + id + '"]');
+    if(opt) opt.textContent = name;
+}
+
+function gmIncrGradeSecCount(gradeId, delta){
+    var row = document.querySelector('#gradesList .gm-row[data-id="' + gradeId + '"]');
+    if(!row) return;
+    var n = parseInt(row.dataset.secCount || 0) + delta;
+    row.dataset.secCount = n;
+    var badge = row.querySelector('.gm-sec-badge');
+    badge.textContent = n + ' stream' + (n!==1?'s':'');
+    badge.className   = 'gm-sec-badge' + (n===0?' zero':'');
+}
+
+/* ════════════════════════════════════════
+   DELETE
+════════════════════════════════════════ */
+var _delTarget = null;
+var _delType   = null;
+
+function gmConfirmDelete(type, btn){
+    _delTarget = btn.closest('.gm-row');
+    _delType   = type;
+    var name   = _delTarget.dataset.name;
+    document.getElementById('gdmTitle').textContent = 'Delete ' + (type==='grade'?'Grade':'Stream') + '?';
+    var warn = type === 'grade'
+        ? 'Deleting <strong>' + gmEsc(name) + '</strong> will also delete all its streams and cannot be undone.'
+        : 'You are about to permanently delete stream <strong>' + gmEsc(name) + '</strong>. This cannot be undone.';
+    document.getElementById('gdmBody').innerHTML = warn;
+    document.getElementById('gmDelOverlay').classList.add('open');
+}
+
+function gmCloseDelModal(){
+    document.getElementById('gmDelOverlay').classList.remove('open');
+    _delTarget = null; _delType = null;
+}
+
+document.getElementById('gmDelOverlay').addEventListener('click', function(e){
+    if(e.target===this) gmCloseDelModal();
+});
+
+document.getElementById('gdmConfirmBtn').addEventListener('click', function(){
+    if(!_delTarget) return;
+    var row  = _delTarget, type = _delType;
+    var id   = row.dataset.id, name = row.dataset.name;
+    gmCloseDelModal();
+
+    var url = type==='grade' ? URLS.gradeDelete(id) : URLS.secDelete(id);
+
+    fetch(url, {method:'POST', headers:{'X-CSRFToken':getCsrf()}})
+    .then(function(r){return r.json();})
+    .then(function(res){
+        if(res.success){
+            row.classList.add('deleting');
+            setTimeout(function(){
+                if(type==='grade'){
+                    /* remove all section rows for this grade */
+                    document.querySelectorAll('#sectionsList .gm-row[data-grade-id="' + id + '"]').forEach(function(r){r.remove();});
+                    /* remove pill */
+                    var pill = document.querySelector('.gm-grade-pill[data-grade-id="' + id + '"]');
+                    if(pill) pill.remove();
+                    /* remove modal option */
+                    var opt = document.querySelector('#gmGradeSelect option[value="' + id + '"]');
+                    if(opt) opt.remove();
+                    row.remove();
+                    gmUpdateGradeCount(); gmCheckEmpty('gradesList','gradesEmpty');
+                    gmUpdateSecCount();   gmCheckEmpty('sectionsList','sectionsEmpty');
+                    gmRefreshGradeNums(); gmRefreshSecNums();
+                    gmShowToast('"' + name + '" and its streams deleted.','error');
+                } else {
+                    var gradeId = row.dataset.gradeId;
+                    row.remove();
+                    gmIncrGradeSecCount(gradeId, -1);
+                    gmUpdateSecCount(); gmCheckEmpty('sectionsList','sectionsEmpty');
+                    gmRefreshSecNums();
+                    gmShowToast('"' + name + '" stream deleted.','error');
+                }
+            }, 320);
+        } else {
+            gmShowToast(res.error || 'Could not delete.','error');
+        }
+    }).catch(function(){ gmShowToast('Network error.','error'); });
+});
+
+/* ════════════════════════════════════════
+   TOAST
+════════════════════════════════════════ */
+var _toastTimer;
+function gmShowToast(msg, type){
+    type = type||'success';
+    var toast = document.getElementById('gmToast');
+    document.getElementById('gmToastMsg').textContent = msg;
+    toast.className = type;
+    var icons = {
+        success: '<polyline points="20 6 9 17 4 12"/>',
+        error:   '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+        warning: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+    };
+    document.getElementById('gmToastIcon').innerHTML = icons[type]||icons.success;
+    requestAnimationFrame(function(){ toast.classList.add('show'); });
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(gmHideToast, 4200);
+}
+function gmHideToast(){ document.getElementById('gmToast').classList.remove('show'); }
+
+/* ════════════════════════════════════════
+   UTILS
+════════════════════════════════════════ */
+function gmEsc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', function(){
+    gmRefreshGradeNums();
+    gmRefreshSecNums();
+    gmUpdateGradeCount();
+    gmUpdateSecCount();
+    gmCheckEmpty('gradesList','gradesEmpty');
+    gmCheckEmpty('sectionsList','sectionsEmpty');
+
+    {% if messages %}
+    {% for message in messages %}
+    gmShowToast("{{ message|escapejs }}", "{{ message.tags|escapejs }}");
+    {% endfor %}
+    {% endif %}
+});
+</script>
+
+{% endblock %}

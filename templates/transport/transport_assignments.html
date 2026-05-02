@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Transport Assignment{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Assign Students to Transport Routes</h3>
+
+    <form method="GET" class="row mb-3">
+        <div class="col-md-4">
+            <select name="classroom" class="form-control">
+                <option value="">Select Class</option>
+                {% for c in classes %}
+                <option value="{{ c.id }}" {% if selected_class==c.id %}selected{% endif %}>
+                    {{ c.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">Load Students</button>
+        </div>
+    </form>
+
+    {% if students %}
+    <form method="POST">
+        {% csrf_token %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Assign Route</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ s }}</td>
+                    <td>
+                        <select name="route_{{ s.id }}" class="form-control">
+                            <option value="">-- None --</option>
+                            {% for r in routes %}
+                            <option value="{{ r.id }}" {% if s.route_id==r.id %}selected{% endif %}>
+                                {{ r.name }} (KES {{ r.fee }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button class="btn btn-success">Save Assignments</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

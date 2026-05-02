@@ -1,0 +1,254 @@
+{% extends "church_base.html" %}
+{% load static %}
+
+{% block title %}Contact & Prayer — ACK Church{% endblock %}
+
+{% block extra_head %}
+
+<!-- BOOTSTRAP ICONS CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    body {
+        background: #f5f9ff;
+    }
+
+    .contact-wrapper {
+        max-width: 1100px;
+        margin: 40px auto;
+    }
+
+    .btn-request {
+        width: fit-content;
+        margin: 12px auto;
+
+    }
+
+    .contact-card {
+        display: flex;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        background: #ffffff;
+    }
+
+    /* LEFT FORM */
+    .contact-left {
+        flex: 1;
+        padding: 40px;
+        background: #ffffff;
+    }
+
+    .contact-left h3 {
+        font-weight: 700;
+        font-size: 26px;
+        margin-bottom: 5px;
+    }
+
+    .contact-left p {
+        color: #555;
+        margin-bottom: 25px;
+    }
+
+    .contact-left .form-control {
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .contact-left button {
+        border-radius: 10px;
+        padding: 10px 22px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    /* RIGHT PANEL */
+    .contact-right {
+        flex: 0.9;
+        padding: 40px;
+        color: white;
+        background: linear-gradient(135deg, #005bff, #4facfe);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .contact-right h4 {
+        font-weight: 700;
+        margin-bottom: 20px;
+        font-size: 22px;
+    }
+
+    .contact-info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        font-size: 15px;
+    }
+
+    .contact-info-item i {
+        font-size: 22px;
+        margin-right: 12px;
+        opacity: 0.9;
+    }
+
+    .map-box {
+        width: 100%;
+        height: 200px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* WHATSAPP FLOAT BUTTON */
+    #whatsappBtn {
+        position: fixed;
+        right: 25px;
+        bottom: 25px;
+        z-index: 9999;
+        text-decoration: none;
+    }
+
+    #whatsappBtn div {
+        background: #25D366;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+    }
+
+    #whatsappBtn i {
+        font-size: 32px;
+        color: white;
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="contact-wrapper">
+
+    <div class="contact-card">
+
+        <!-- LEFT FORM -->
+        <div class="contact-left">
+            <h3>Send a Prayer Request</h3>
+            <p>We care for you. Submit your prayer below.</p>
+
+            <form id="prayerForm">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+
+                        <input name="name" class="form-control" required placeholder="Name">
+                    </div>
+                    <div class="col-md-6 mb-3">
+
+                        <input name="email" class="form-control" type="email" placeholder=" Email">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+
+                    <input name="subject" class="form-control" placeholder="Subject">
+                </div>
+
+                <div class="mb-3">
+
+                    <textarea name="message" rows="5" class="form-control"
+                        placeholder="Type your prayer request here"></textarea>
+                </div>
+                <div class="btn-request">
+                    <button class="btn btn-primary" type="submit">Send Request</button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- RIGHT INFO PANEL -->
+        <div class="contact-right">
+
+            <div>
+                <h4>Contact Details</h4>
+
+                <div class="contact-info-item">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    123 Church Road, Nairobi, Kenya
+                </div>
+
+                <div class="contact-info-item">
+                    <i class="bi bi-telephone-fill"></i>
+                    +254 703811230
+                </div>
+
+                <div class="contact-info-item">
+                    <i class="bi bi-envelope-fill"></i>
+                    waguracharles62@gmail.com
+                </div>
+
+                <div class="contact-info-item">
+                    <i class="bi bi-globe2"></i>
+                    www.ackchurch.org
+                </div>
+
+                <!-- MAP -->
+                <div class="map-box">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.7506646145253!2d37.14696347496484!3d-0.7282619992930583!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1828472ebae9950f%3A0xc998cb47dfbb4a!2sACK%20St%20Peter&#39;s%20Church%20Murang&#39;a!5e0!3m2!1sen!2ske!4v1732100949001!5m2!1sen!2ske"
+                        width="100%" height="100%" style="border:0;" loading="lazy">
+                    </iframe>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- WHATSAPP FLOATING BUTTON -->
+<a id="whatsappBtn" href="https://wa.me/254703811230?text=Hello%20ACK%20Church" target="_blank">
+    <div><i class="bi bi-whatsapp"></i></div>
+</a>
+
+<!-- SUCCESS MODAL -->
+<div class="modal fade" id="prayerSuccessModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4" style="border-radius:18px;">
+            <h4 class="mb-3">Thank You!</h4>
+            <p>Your prayer request has been received. We will pray with you.</p>
+            <button class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('prayerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+
+        try {
+            const res = await fetch("{% url 'prayer_request' %}", {
+                method: "POST",
+                headers: { "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value },
+                body: new FormData(form)
+            });
+
+            if (!res.ok) throw new Error();
+
+            new bootstrap.Modal(document.getElementById("prayerSuccessModal")).show();
+            form.reset();
+
+        } catch (err) {
+            alert("Failed to submit. Try again later.");
+        }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+<h2>{{ classroom }} Timetable</h2>
+
+<table border="1" cellpadding="8">
+<tr>
+    <th>Day</th>
+    <th>Time</th>
+    <th>Subject</th>
+    <th>Teacher</th>
+</tr>
+
+{% for e in entries %}
+<tr>
+    <td>{{ e.day|title }}</td>
+    <td>{{ e.start_time }} - {{ e.end_time }}</td>
+    <td>{{ e.subject.name }}</td>
+    <td>{{ e.teacher.user.get_full_name }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<br>
+
+<button onclick="window.print()">Print</button>

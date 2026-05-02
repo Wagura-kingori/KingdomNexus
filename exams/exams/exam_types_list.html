@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Exam Types</h2>
+
+    <a href="{% url 'exam_types_add' %}" class="btn btn-primary mb-3">+ Add Exam Type</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Exam Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in types %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ t.name }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">No exam types yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

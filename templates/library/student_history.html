@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Borrowing History{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ student }} — Borrowing History</h2>
+
+    {% if records %}
+    <table class="table table-bordered table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Book</th>
+                <th>Date Borrowed</th>
+                <th>Returned</th>
+                <th>Fine</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in records %}
+            <tr>
+                <td>{{ r.book.title }}</td>
+                <td>{{ r.date_borrowed|date:"d M Y" }}</td>
+                <td>
+                    {% if r.date_returned %}
+                    {{ r.date_returned|date:"d M Y" }}
+                    {% else %}
+                    <span class="text-danger">Not returned</span>
+                    {% endif %}
+                </td>
+                <td>KES {{ r.fine_amount }}</td>
+                <td>
+                    {% if r.is_overdue %}
+                    <span class="badge bg-danger">Overdue</span>
+                    {% else %}
+                    <span class="badge bg-success">OK</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="alert alert-info mt-3">No borrowing history found.</p>
+    {% endif %}
+</div>
+{% endblock %}

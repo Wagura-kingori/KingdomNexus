@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Issue Fine{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Issue Fine to {{ borrow.student }}</h2>
+    <p>Book: <strong>{{ borrow.book.title }}</strong></p>
+    <p>Overdue by <strong>{{ borrow.days_overdue }}</strong> days</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="card p-4 shadow-sm">
+
+            <div class="mb-3">
+                {{ form.amount.label_tag }}
+                {{ form.amount }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.notes.label_tag }}
+                {{ form.notes }}
+            </div>
+
+            <button class="btn btn-success">Save Fine</button>
+            <a href="{% url 'library:overdue_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

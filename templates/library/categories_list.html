@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Library Categories{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Book Categories</h2>
+
+    <a href="{% url 'library:category_add' %}" class="btn btn-primary mb-3">Add Category</a>
+
+    {% if categories %}
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in categories %}
+            <tr>
+                <td>{{ c.name }}</td>
+                <td>{{ c.description }}</td>
+                <td>
+                    <a href="{% url 'library:category_edit' c.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'library:category_delete' c.id %}" class="btn btn-sm btn-danger"
+                        onclick="return confirm('Delete this category?');">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="alert alert-info">No categories available.</p>
+    {% endif %}
+</div>
+{% endblock %}

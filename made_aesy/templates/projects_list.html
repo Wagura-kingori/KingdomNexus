@@ -1,0 +1,31 @@
+{% extends 'church_base.html' %}
+{% load static %}
+{% block title %}Projects — ACK Church{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom:30px; text-align: center;">All Church Projects</h1>
+
+{% if projects %}
+<div style="display:flex; flex-wrap:wrap; gap:20px;">
+    {% for project in projects %}
+    <div
+        style="flex:1 1 300px; border:1px solid #ccc; border-radius:5px; padding:15px; box-shadow:1px 1px 5px rgba(0,0,0,0.1);">
+        <h3>{{ project.title }}</h3>
+        {% if project.cover %}
+        <img src="{{ project.cover.url }}" alt="{{ project.title }}"
+            style="width:100%; height:auto; margin:10px 0; border-radius:5px;">
+        {% else %}
+        <img src="{% static 'images/project-placeholder.jpg' %}" alt="{{ project.title }}"
+            style="width:100%; height:auto; margin:10px 0; border-radius:5px;">
+        {% endif %}
+        <p>{{ project.short_description|truncatechars:120 }}</p>
+        <a href="{{ project.get_absolute_url }}" style="display:inline-block; margin-top:10px; color:#007bff;">View
+            Project</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-center">No projects available at the moment. Please check back later.</p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Transport Payments{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Transport Payments</h2>
+
+    <a href="{% url 'transport:payment_create' %}" class="btn btn-primary mb-3">
+        + Add Payment
+    </a>
+
+    <div class="card">
+        <div class="card-header">
+            <strong>All Payments</strong>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Student</th>
+                        <th>Route</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ p.assignment.student }}</td>
+                        <td>{{ p.assignment.route }}</td>
+                        <td>KES {{ p.amount }}</td>
+                        <td>{{ p.method }}</td>
+                        <td>{{ p.date }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-3">
+                            No payments recorded yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

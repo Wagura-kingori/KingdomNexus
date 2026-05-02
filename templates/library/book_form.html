@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Book Form{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title }}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="card p-4 shadow-sm">
+            <div class="mb-3">
+                {{ form.title.label_tag }}
+                {{ form.title }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.category.label_tag }}
+                {{ form.category }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.author.label_tag }}
+                {{ form.author }}
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.total_copies.label_tag }}
+                    {{ form.total_copies }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form.available_copies.label_tag }}
+                    {{ form.available_copies }}
+                </div>
+            </div>
+
+            <button class="btn btn-success">Save</button>
+            <a href="{% url 'library:books_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

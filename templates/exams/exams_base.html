@@ -1,0 +1,271 @@
+
+{% block title %}{% block exam_title %}Exams{% endblock %}{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── GLOBAL ── */
+body,body.light-mode,body.dark-mode{background-color:#080f1c!important;color:#e2e8f0!important;}
+main.container{padding-top:0!important;max-width:100%!important;padding-left:0!important;padding-right:0!important;}
+
+/* ── LAYOUT ── */
+.exm-layout{display:flex;min-height:calc(100vh - 60px);}
+
+/* ── SIDEBAR ── */
+.exm-sidebar{
+    width:240px;flex-shrink:0;
+    background:#060d1a;
+    border-right:1px solid rgba(56,189,248,.08);
+    position:sticky;top:60px;height:calc(100vh - 60px);
+    overflow-y:auto;overflow-x:hidden;
+    scrollbar-width:thin;scrollbar-color:rgba(56,189,248,.15) transparent;
+    display:flex;flex-direction:column;
+    transition:width .25s;
+    z-index:50;
+}
+.exm-sidebar::-webkit-scrollbar{width:3px;}
+.exm-sidebar::-webkit-scrollbar-thumb{background:rgba(56,189,248,.2);border-radius:2px;}
+
+.exm-sidebar-brand{
+    padding:1.1rem 1.2rem .9rem;
+    border-bottom:1px solid rgba(56,189,248,.08);
+    display:flex;align-items:center;gap:.6rem;
+    text-decoration:none!important;
+}
+.exm-brand-dot{width:8px;height:8px;border-radius:50%;background:#38bdf8;box-shadow:0 0 8px rgba(56,189,248,.7);flex-shrink:0;}
+.exm-brand-label{font-size:.68rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#38bdf8;white-space:nowrap;}
+
+.exm-sidebar-section{padding:.75rem .8rem .3rem;font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1e3a5f;}
+
+.exm-nav-link{
+    display:flex;align-items:center;gap:.7rem;
+    padding:.62rem 1.1rem;
+    font-size:.81rem;font-weight:500;
+    color:#475569;text-decoration:none!important;
+    border-left:3px solid transparent;
+    transition:all .15s;white-space:nowrap;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    position:relative;
+}
+.exm-nav-link i{font-size:.78rem;width:16px;text-align:center;flex-shrink:0;transition:color .15s;}
+.exm-nav-link:hover{color:#cbd5e1;background:rgba(56,189,248,.05);border-left-color:rgba(56,189,248,.3);}
+.exm-nav-link.active{color:#38bdf8;background:rgba(56,189,248,.08);border-left-color:#38bdf8;font-weight:600;}
+.exm-nav-link.active i{color:#38bdf8;}
+.exm-nav-link:hover i{color:#64748b;}
+
+.exm-sidebar-footer{margin-top:auto;padding:.9rem 1rem;border-top:1px solid rgba(255,255,255,.05);}
+.exm-back-dash{display:flex;align-items:center;gap:.6rem;font-size:.76rem;font-weight:600;color:#334155;text-decoration:none!important;padding:.4rem .6rem;border-radius:8px;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;}
+.exm-back-dash:hover{color:#38bdf8;background:rgba(56,189,248,.06);}
+.exm-back-dash i{font-size:.72rem;}
+
+/* Mobile sidebar toggle */
+.exm-sidebar-toggle{display:none;position:fixed;bottom:1.5rem;right:1.5rem;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#38bdf8);border:none;color:#fff;font-size:1.1rem;cursor:pointer;box-shadow:0 6px 20px rgba(14,165,233,.4);z-index:200;align-items:center;justify-content:center;transition:all .2s;}
+.exm-sidebar.mobile-open{width:240px!important;}
+
+/* ── MAIN CONTENT ── */
+.exm-main{flex:1;padding:2rem 2.2rem 5rem;min-width:0;font-family:'Plus Jakarta Sans',sans-serif;}
+
+/* ── TOAST NOTIFICATIONS ── */
+.exm-toast-container{position:fixed;top:72px;right:1.2rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;pointer-events:none;}
+.exm-toast{
+    display:flex;align-items:flex-start;gap:.7rem;
+    padding:.8rem 1.1rem;
+    border-radius:12px;border:1px solid;
+    font-size:.82rem;font-weight:500;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    box-shadow:0 8px 24px rgba(0,0,0,.5);
+    backdrop-filter:blur(12px);
+    pointer-events:all;
+    animation:toastIn .3s cubic-bezier(.34,1.56,.64,1) both;
+    max-width:340px;
+    position:relative;
+}
+.exm-toast.toast-success{background:rgba(16,30,16,.95);border-color:rgba(52,211,153,.3);color:#6ee7b7;}
+.exm-toast.toast-error{background:rgba(30,10,10,.95);border-color:rgba(239,68,68,.3);color:#fca5a5;}
+.exm-toast.toast-info{background:rgba(10,20,38,.95);border-color:rgba(56,189,248,.3);color:#7dd3fc;}
+.exm-toast i{font-size:.88rem;flex-shrink:0;margin-top:.05rem;}
+.exm-toast-close{margin-left:auto;background:none;border:none;color:inherit;opacity:.5;cursor:pointer;padding:0 0 0 .5rem;font-size:.85rem;transition:opacity .15s;flex-shrink:0;}
+.exm-toast-close:hover{opacity:1;}
+.exm-toast-bar{position:absolute;bottom:0;left:0;height:2px;background:currentColor;opacity:.4;border-radius:0 0 12px 12px;animation:toastBar 4s linear forwards;}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px) scale(.95);}to{opacity:1;transform:translateX(0) scale(1);}}
+@keyframes toastBar{from{width:100%;}to{width:0%;}}
+.exm-toast.toast-hiding{animation:toastOut .25s ease forwards;}
+@keyframes toastOut{to{opacity:0;transform:translateX(20px) scale(.95);}}
+
+/* ── PAGE HEADER ── */
+.exm-page-header{margin-bottom:2rem;padding-bottom:1.2rem;border-bottom:1px solid rgba(56,189,248,.08);}
+.exm-pg-label{font-size:.66rem;font-weight:700;letter-spacing:2.8px;text-transform:uppercase;color:#38bdf8;margin-bottom:.35rem;display:flex;align-items:center;gap:.4rem;}
+.exm-pg-label::before{content:'';width:14px;height:2px;background:#38bdf8;border-radius:2px;}
+.exm-page-title{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;color:#f0f9ff;margin:0 0 .2rem;line-height:1.15;}
+.exm-page-sub{font-size:.8rem;color:#475569;}
+.exm-page-header-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+
+/* ── CARDS ── */
+.exm-card{background:#0d1b2e;border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;margin-bottom:1.4rem;}
+.exm-card-head{padding:.9rem 1.4rem;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(56,189,248,.04);display:flex;align-items:center;gap:.65rem;}
+.exm-card-icon{width:28px;height:28px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.74rem;color:#38bdf8;flex-shrink:0;}
+.exm-card-head h6{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:#f1f5f9;margin:0;}
+.exm-card-head small{margin-left:auto;font-size:.7rem;color:#334155;}
+.exm-card-body{padding:1.4rem;}
+
+/* ── TABLE ── */
+.exm-table{width:100%;border-collapse:collapse;}
+.exm-table thead tr{background:rgba(56,189,248,.04);border-bottom:1px solid rgba(56,189,248,.1);}
+.exm-table thead th{padding:.8rem 1.1rem;text-align:left;font-size:.67rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#38bdf8;}
+.exm-table tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .12s;}
+.exm-table tbody tr:last-child{border-bottom:none;}
+.exm-table tbody tr:hover{background:rgba(56,189,248,.03);}
+.exm-table td{padding:.8rem 1.1rem;font-size:.83rem;color:#94a3b8;vertical-align:middle;}
+.exm-table td.td-name{font-weight:600;color:#e2e8f0;}
+.exm-empty{padding:3rem 2rem;text-align:center;}
+.exm-empty i{font-size:2rem;color:#1e3a5f;display:block;margin-bottom:.8rem;}
+.exm-empty p{font-size:.83rem;color:#334155;margin:0;}
+
+/* ── FORM FIELDS ── */
+.exm-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.exm-field{margin-bottom:1.2rem;}
+.exm-field:last-child{margin-bottom:0;}
+.exm-lbl{display:block;font-size:.7rem;font-weight:700;color:#64748b;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.42rem;}
+.exm-lbl .req{color:#f87171;margin-left:.2rem;}
+.exm-input,.exm-select,.exm-textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.65rem .95rem;font-size:.86rem;font-family:'Plus Jakarta Sans',sans-serif;color:#e2e8f0;transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none;}
+.exm-input:focus,.exm-select:focus,.exm-textarea:focus{border-color:rgba(56,189,248,.45);background:rgba(56,189,248,.04);box-shadow:0 0 0 3px rgba(56,189,248,.1);}
+.exm-input::placeholder,.exm-textarea::placeholder{color:#334155;}
+.exm-select{cursor:pointer;}
+.exm-select option{background:#0d1b2e;color:#e2e8f0;}
+.exm-textarea{resize:vertical;min-height:80px;}
+.exm-hint{font-size:.71rem;color:#334155;margin-top:.3rem;}
+.exm-hint a{color:#38bdf8;text-decoration:none;}
+.exm-field-error{font-size:.72rem;color:#fca5a5;margin-top:.32rem;display:flex;align-items:center;gap:.3rem;}
+
+/* ── BUTTONS ── */
+.exm-btn{display:inline-flex;align-items:center;gap:.42rem;font-size:.8rem;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;border-radius:9px;padding:.5rem 1.15rem;cursor:pointer;border:1px solid;transition:all .2s;text-decoration:none!important;letter-spacing:.1px;}
+.exm-btn-primary{background:linear-gradient(135deg,#0ea5e9,#38bdf8);border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(14,165,233,.28);}
+.exm-btn-primary:hover{background:linear-gradient(135deg,#0284c7,#0ea5e9);color:#fff;box-shadow:0 6px 20px rgba(14,165,233,.4);transform:translateY(-1px);}
+.exm-btn-ghost{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:#64748b;}
+.exm-btn-ghost:hover{background:rgba(255,255,255,.08);color:#e2e8f0;border-color:rgba(255,255,255,.18);}
+.exm-btn-sm{padding:.3rem .7rem;font-size:.73rem;}
+.exm-actions{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-top:.2rem;}
+
+/* ── BADGES ── */
+.exm-badge{display:inline-block;border-radius:6px;padding:.16rem .58rem;font-size:.67rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.badge-blue{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);color:#38bdf8;}
+.badge-green{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);color:#34d399;}
+.badge-gold{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:#fbbf24;}
+.badge-red{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:#f87171;}
+
+/* ── SCORES / GRADES ── */
+.score{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;}
+.score-high{color:#34d399;}.score-mid{color:#fbbf24;}.score-low{color:#f87171;}
+.grade-badge{display:inline-block;border-radius:6px;padding:.14rem .52rem;font-size:.68rem;font-weight:700;}
+.grade-a{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);color:#34d399;}
+.grade-b{background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.25);color:#60a5fa;}
+.grade-c{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);color:#fbbf24;}
+.grade-d{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.25);color:#f87171;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+    .exm-sidebar{width:0;overflow:hidden;position:fixed;top:60px;left:0;height:calc(100vh - 60px);}
+    .exm-sidebar.mobile-open{width:240px!important;box-shadow:8px 0 32px rgba(0,0,0,.6);}
+    .exm-sidebar-toggle{display:flex;}
+    .exm-main{padding:1.4rem 1rem 5rem;}
+    .exm-grid-2{grid-template-columns:1fr;}
+}
+{% block exam_extra_style %}{% endblock %}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{# ── TOAST CONTAINER ── #}
+{% if messages %}
+<div class="exm-toast-container" id="exmToasts">
+    {% for message in messages %}
+    <div class="exm-toast {% if 'error' in message.tags %}toast-error{% elif 'success' in message.tags %}toast-success{% else %}toast-info{% endif %}" role="alert">
+        <i class="fas {% if 'error' in message.tags %}fa-exclamation-circle{% elif 'success' in message.tags %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
+        <span>{{ message }}</span>
+        <button class="exm-toast-close" onclick="dismissToast(this.parentElement)" aria-label="Dismiss">✕</button>
+        <div class="exm-toast-bar"></div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{# ── LAYOUT ── #}
+<div class="exm-layout">
+
+    {# ── SIDEBAR ── #}
+    <aside class="exm-sidebar" id="exmSidebar">
+        <a href="{% url 'exams:exams_list' %}" class="exm-sidebar-brand">
+            <span class="exm-brand-dot"></span>
+            <span class="exm-brand-label">Exams Portal</span>
+        </a>
+
+        <div class="exm-sidebar-section">Exams</div>
+        <a href="{% url 'exams:exams_list' %}"    class="exm-nav-link {% block nav_exams %}{% endblock %}"><i class="fas fa-file-alt"></i> All Exams</a>
+        <a href="{% url 'exams:exam_create' %}"   class="exm-nav-link {% block nav_create_exam %}{% endblock %}"><i class="fas fa-plus-circle"></i> Create Exam</a>
+
+        <div class="exm-sidebar-section">Exam Types</div>
+        <a href="{% url 'exams:exam_types_list' %}"  class="exm-nav-link {% block nav_types %}{% endblock %}"><i class="fas fa-tags"></i> All Types</a>
+        <a href="{% url 'exams:exam_type_create' %}" class="exm-nav-link {% block nav_type_create %}{% endblock %}"><i class="fas fa-plus"></i> Add Type</a>
+
+        <div class="exm-sidebar-section">Results</div>
+        <a href="{% url 'exams:results_list' %}"  class="exm-nav-link {% block nav_results %}{% endblock %}"><i class="fas fa-chart-bar"></i> All Results</a>
+
+        <div class="exm-sidebar-footer">
+            <a href="{% url 'teachers:dashboard' %}" class="exm-back-dash">
+                <i class="fas fa-arrow-left"></i> Teacher Dashboard
+            </a>
+        </div>
+    </aside>
+
+    {# ── MAIN ── #}
+    <main class="exm-main">
+        {% block exam_content %}{% endblock %}
+    </main>
+
+</div>
+
+{# Mobile toggle button #}
+<button class="exm-sidebar-toggle" id="exmToggle" aria-label="Toggle menu">
+    <i class="fas fa-bars" id="exmToggleIcon"></i>
+</button>
+
+<script>
+/* ── TOAST AUTO-DISMISS ── */
+function dismissToast(el) {
+    el.classList.add('toast-hiding');
+    setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 260);
+}
+document.addEventListener('DOMContentLoaded', function () {
+    var toasts = document.querySelectorAll('.exm-toast');
+    toasts.forEach(function (toast, i) {
+        setTimeout(function () { dismissToast(toast); }, 4000 + i * 300);
+    });
+});
+
+/* ── MOBILE SIDEBAR ── */
+var sidebar  = document.getElementById('exmSidebar');
+var toggle   = document.getElementById('exmToggle');
+var icon     = document.getElementById('exmToggleIcon');
+var overlay  = null;
+
+function openSidebar() {
+    sidebar.classList.add('mobile-open');
+    icon.className = 'fas fa-times';
+    overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49;';
+    overlay.addEventListener('click', closeSidebar);
+    document.body.appendChild(overlay);
+}
+function closeSidebar() {
+    sidebar.classList.remove('mobile-open');
+    icon.className = 'fas fa-bars';
+    if (overlay && overlay.parentNode) { overlay.parentNode.removeChild(overlay); overlay = null; }
+}
+toggle.addEventListener('click', function () {
+    sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+
+{% extends "exams/exams_base.html" %}
+{% block exam_title %}All Results{% endblock %}
+{% block nav_results %}active{% endblock %}
+
+{% block exam_content %}
+<div class="exm-page-header">
+    <div class="exm-page-header-row">
+        <div>
+            <div class="exm-pg-label">Results</div>
+            <h1 class="exm-page-title">All Results</h1>
+            <div class="exm-page-sub">{{ results.count }} result{{ results.count|pluralize }} recorded.</div>
+        </div>
+        <a href="{% url 'exams:results_form' %}" class="exm-btn exm-btn-primary"><i class="fas fa-plus"></i> Add Result</a>
+    </div>
+</div>
+
+<div class="exm-card">
+    <div class="exm-card-head">
+        <span class="exm-card-icon"><i class="fas fa-chart-bar"></i></span>
+        <h6>Results</h6>
+    </div>
+    {% if results %}
+    <div style="overflow-x:auto;">
+    <table class="exm-table">
+        <thead><tr><th>#</th><th>Student</th><th>Exam</th><th>Score</th><th>Grade</th><th>Position</th><th>Action</th></tr></thead>
+        <tbody>
+            {% for r in results %}
+            <tr>
+                <td style="color:#334155;">{{ forloop.counter }}</td>
+                <td class="td-name">{{ r.student }}</td>
+                <td style="font-size:.78rem;">{{ r.exam.name }} — {{ r.exam.term }} {{ r.exam.year }}</td>
+                <td><span class="score {% if r.score >= 70 %}score-high{% elif r.score >= 50 %}score-mid{% else %}score-low{% endif %}">{{ r.score }}</span></td>
+                <td>{% if r.grade %}<span class="grade-badge grade-{{ r.grade|lower }}">{{ r.grade }}</span>{% else %}<span style="color:#334155;">—</span>{% endif %}</td>
+                <td>{% if r.position %}#{{ r.position }}{% else %}<span style="color:#334155;">—</span>{% endif %}</td>
+                <td><a href="{% url 'exams:results_form' r.id %}" class="exm-btn exm-btn-ghost exm-btn-sm"><i class="fas fa-pen"></i> Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="exm-empty"><i class="fas fa-chart-bar"></i><p>No results recorded yet.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

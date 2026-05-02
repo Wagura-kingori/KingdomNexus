@@ -1,0 +1,31 @@
+{% extends 'dashboard_base.html' %}
+{% block content %}
+<h2>{{ subject.name }} - {{ subject.classroom }}</h2>
+
+<h4>Students</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th>Marks</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in subject_students %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ s.student }}</td>
+            <td>{{ s.score|default:"-" }}</td>
+            <td>
+                <a href="{% url 'teacher_enter_marks' subject.id s.student.id %}" class="btn btn-success btn-sm">
+                    Enter Marks
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+{% endblock %}

@@ -1,0 +1,262 @@
+{% extends 'church_base.html' %}
+{% load static %}
+
+{% block title %}Children Ministry — ACK Church{% endblock %}
+
+{% block extra_head %}
+<style>
+    .mini-hero {
+        background: linear-gradient(90deg, #ffb27e, #ffe9ba);
+        color: #2c1a00;
+        padding: 40px;
+        border-radius: 18px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .lead-card,
+    .info-card {
+        border-radius: 14px;
+        background: #fffaf2;
+        padding: 24px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
+        height: 100%;
+    }
+
+    .section-title {
+        margin-top: 40px;
+        margin-bottom: 16px;
+        font-weight: 700;
+        color: #8a4b00;
+    }
+
+    .leader-box {
+        background: #fff8ef;
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .leader-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #ffd8a6;
+    }
+
+    .gallery-img {
+        border-radius: 12px;
+        width: 100%;
+        height: 170px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<div class="mini-hero mb-4">
+    <h2 class="fw-bold">Children Ministry</h2>
+    <p class="lead">Building a Christ-centered foundation for our children through love, learning and worship.</p>
+</div>
+
+<!-- MISSION & VISION -->
+<h4 class="section-title">Our Mission & Vision</h4>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="lead-card">
+            <h5>Mission</h5>
+            <p>To nurture children in the knowledge and fear of God, helping them grow spiritually, morally and
+                emotionally through biblical teaching and mentorship.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="lead-card">
+            <h5>Vision</h5>
+            <p>To raise a generation of God-fearing boys and girls who will serve Christ faithfully in church and
+                society.</p>
+        </div>
+    </div>
+</div>
+
+<!-- AGE GROUPS -->
+<h4 class="section-title">Age Groups</h4>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="info-card">
+            <h6>• Beginners (3–5 yrs)</h6>
+            <p>Interactive Bible stories, songs, memory verses and fun learning.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="info-card">
+            <h6>• Middle Class (6–8 yrs)</h6>
+            <p>Foundational Bible understanding, worship, teamwork and crafts.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="info-card">
+            <h6>• Pre-Teens (9–12 yrs)</h6>
+            <p>Deeper Bible study, leadership skills, Christian values and talent development.</p>
+        </div>
+    </div>
+</div>
+
+<!-- WEEKLY PROGRAMS -->
+<h4 class="section-title">Weekly Programs</h4>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="lead-card">
+            <h5>Sunday School — Every Sunday</h5>
+            <ul>
+                <li>Bible lessons with visual aids</li>
+                <li>Children praise & worship</li>
+                <li>Memory verse challenge</li>
+                <li>Creative crafts and games</li>
+                <li>Prayer and life-application discussions</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="lead-card">
+            <h5>Saturday Fellowship (10:00AM – 12:30PM)</h5>
+            <ul>
+                <li>Bible study classes</li>
+                <li>Music & drama practice</li>
+                <li>Leadership & discipline training</li>
+                <li>Skill workshops (art, dance, music)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- CURRICULUM -->
+<h4 class="section-title">Bible Curriculum</h4>
+<div class="lead-card mb-3">
+    <p>ACK Children Ministry follows a structured curriculum covering:</p>
+    <ul>
+        <li>Creation, Patriarchs & Early Bible characters</li>
+        <li>Life and teachings of Jesus Christ</li>
+        <li>Parables and miracles</li>
+        <li>Christian values — honesty, kindness, respect</li>
+        <li>Sacramental teaching in a child-friendly format</li>
+        <li>Church seasons — Advent, Lent, Easter, Christmas</li>
+    </ul>
+</div>
+
+<!-- CLUBS & ACTIVITIES -->
+<h4 class="section-title">Clubs & Activities</h4>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="info-card">
+            <h6>• Music, Dance & Drama (MDD)</h6>
+            <p>Choir, memory verses, skits and worship expressions.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="info-card">
+            <h6>• Junior Readers & Bible Quiz Club</h6>
+            <p>Children learn to interpret scriptures and compete in quiz challenges.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="info-card">
+            <h6>• Talent Development</h6>
+            <p>Drawing, dancing, singing, storytelling and more.</p>
+        </div>
+    </div>
+</div>
+
+<!-- EVENTS -->
+<h4 class="section-title">Events & Retreats</h4>
+<div class="lead-card">
+    <ul>
+        <li>Annual VBS (Vacation Bible School)</li>
+        <li>Children Sunday & Presentations</li>
+        <li>Weekend retreats & prayer camps</li>
+        <li>Talent exhibitions</li>
+        <li>Mission & charity visits</li>
+    </ul>
+</div>
+
+<!-- SAFETY & CHILD PROTECTION -->
+<h4 class="section-title">Child Safety & Protection</h4>
+<div class="lead-card">
+    <p>ACK Church prioritizes child safety. All teachers and volunteers:</p>
+    <ul>
+        <li>Are vetted and trained on child protection</li>
+        <li>Follow church safeguarding policies</li>
+        <li>Ensure a safe, respectful learning environment</li>
+        <li>Maintain proper supervision during all activities</li>
+    </ul>
+</div>
+
+<!-- LEADERSHIP -->
+<h4 class="section-title">Our Ministry Leaders</h4>
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <div class="leader-box">
+            <img src="{% static 'images/leader-placeholder.jpg' %}" class="leader-img">
+            <p class="fw-bold mt-2 mb-0">Teacher Mary</p>
+            <p class="small text-muted">Children Ministry Coordinator</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="leader-box">
+            <img src="{% static 'images/leader-placeholder.jpg' %}" class="leader-img">
+            <p class="fw-bold mt-2 mb-0">Teacher Samuel</p>
+            <p class="small text-muted">Bible Study Instructor</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="leader-box">
+            <img src="{% static 'images/leader-placeholder.jpg' %}" class="leader-img">
+            <p class="fw-bold mt-2 mb-0">Teacher Grace</p>
+            <p class="small text-muted">Worship & Music Coach</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="leader-box">
+            <img src="{% static 'images/leader-placeholder.jpg' %}" class="leader-img">
+            <p class="fw-bold mt-2 mb-0">Teacher John</p>
+            <p class="small text-muted">Pre-Teens Mentor</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- GALLERY -->
+<h4 class="section-title">Gallery</h4>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <img src="{% static 'images/gallery-placeholder.jpg' %}" class="gallery-img">
+    </div>
+    <div class="col-md-4">
+        <img src="{% static 'images/gallery-placeholder.jpg' %}" class="gallery-img">
+    </div>
+    <div class="col-md-4">
+        <img src="{% static 'images/gallery-placeholder.jpg' %}" class="gallery-img">
+    </div>
+</div>
+
+<!-- CONTACT -->
+<h4 class="section-title">Contact the Children Ministry</h4>
+<div class="lead-card">
+    <p><strong>Email:</strong> childrenministry@yourchurch.org</p>
+    <p><strong>Office Hours:</strong> Tue–Sun, 9:00AM – 4:00PM</p>
+    <p>Parents are welcome to visit, volunteer or enroll their children at any time.</p>
+</div>
+
+{% endblock %}

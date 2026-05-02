@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Subjects</h1>
+<a href="{% url 'academics:subject_create' %}">Add Subject</a>
+<ul>
+    {% for subject in subjects %}
+    <li>{{ subject.name }} ({{ subject.code }})</li>
+    {% empty %}
+    <li>No subjects found.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

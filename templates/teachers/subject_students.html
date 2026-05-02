@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block title %}{{ subject.name }} — Students{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body, body.light-mode, body.dark-mode { background-color: #080f1c !important; color: #e2e8f0 !important; }
+main.container { padding-top: 0 !important; max-width: 100% !important; padding-left: 0 !important; padding-right: 0 !important; }
+
+.ts-subnav {
+    background: rgba(10,20,38,.98); border-bottom: 1px solid rgba(56,189,248,.1);
+    backdrop-filter: blur(16px); display: flex; align-items: center;
+    height: 52px; padding: 0 1.6rem; gap: .8rem;
+    position: sticky; top: 60px; z-index: 900;
+}
+.ts-back {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .76rem; font-weight: 600; color: #64748b;
+    text-decoration: none !important; padding: .32rem .75rem;
+    border-radius: 8px; border: 1px solid rgba(255,255,255,.07);
+    transition: all .15s; font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.ts-back:hover { background: rgba(56,189,248,.08); color: #38bdf8; border-color: rgba(56,189,248,.2); }
+.ts-back i { font-size: .7rem; }
+.ts-nav-title { font-size: .7rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #38bdf8; flex: 1; }
+.ts-breadcrumb { font-size: .73rem; color: #334155; display: flex; align-items: center; gap: .4rem; }
+.ts-breadcrumb a { color: #475569; text-decoration: none; }
+.ts-breadcrumb a:hover { color: #38bdf8; }
+.ts-breadcrumb i { font-size: .55rem; }
+
+#ts-page {
+    font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0;
+    padding: 2rem 1.8rem 5rem; max-width: 1100px; margin: 0 auto;
+    animation: tsFadeUp .4s ease both;
+}
+@keyframes tsFadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+#ts-page .ts-hero {
+    background: linear-gradient(135deg, #0c2035 0%, #0e2d4d 55%, #0b3a61 100%);
+    border-radius: 18px; padding: 2rem 2.4rem; margin-bottom: 2rem;
+    border: 1px solid rgba(56,189,248,.12);
+    box-shadow: 0 20px 56px rgba(0,0,0,.5);
+    position: relative; overflow: hidden;
+}
+#ts-page .ts-hero::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,189,248,.08) 0%, transparent 70%);
+}
+#ts-page .ts-hero-inner { position: relative; z-index: 2; }
+#ts-page .ts-pg-label {
+    font-size: .68rem; font-weight: 700; letter-spacing: 2.8px;
+    text-transform: uppercase; color: #38bdf8; margin-bottom: .4rem;
+    display: flex; align-items: center; gap: .45rem;
+}
+#ts-page .ts-pg-label::before { content: ''; width: 16px; height: 2px; background: #38bdf8; border-radius: 2px; }
+#ts-page .ts-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem; font-weight: 700; color: #f0f9ff;
+    margin: 0 0 .6rem; line-height: 1.15;
+}
+#ts-page .ts-pill {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 30px; padding: .28rem .8rem;
+    font-size: .76rem; font-weight: 500; color: #cbd5e1;
+}
+#ts-page .ts-pill i { color: #38bdf8; font-size: .7rem; }
+
+#ts-page .ts-stat-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.8rem; }
+#ts-page .ts-stat {
+    background: #0d1b2e; border: 1px solid rgba(255,255,255,.07);
+    border-radius: 14px; padding: 1.1rem 1.4rem;
+    display: flex; align-items: center; gap: .9rem;
+    min-width: 160px; flex: 1;
+}
+#ts-page .ts-stat-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+}
+.si-blue  { background: rgba(59,130,246,.14); color: #60a5fa; }
+.si-green { background: rgba(16,185,129,.14); color: #34d399; }
+.si-gold  { background: rgba(251,191,36,.12); color: #fbbf24; }
+#ts-page .ts-stat-num { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #f1f5f9; line-height: 1; }
+#ts-page .ts-stat-lbl { font-size: .72rem; color: #475569; margin-top: .15rem; font-weight: 500; }
+
+#ts-page .ts-section-head {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700;
+    color: #f1f5f9; margin-bottom: 1rem;
+    display: flex; align-items: center; gap: .7rem;
+}
+#ts-page .ts-section-head .sh-icon {
+    width: 30px; height: 30px; background: rgba(56,189,248,.1);
+    border: 1px solid rgba(56,189,248,.2); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; color: #38bdf8; flex-shrink: 0;
+}
+#ts-page .ts-section-head::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(56,189,248,.2), transparent); margin-left: .5rem;
+}
+
+#ts-page .ts-search {
+    width: 100%; background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+    padding: .65rem 1rem .65rem 2.6rem; font-size: .86rem;
+    font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0;
+    outline: none; margin-bottom: 1.2rem;
+    transition: border-color .2s, box-shadow .2s;
+}
+#ts-page .ts-search:focus { border-color: rgba(56,189,248,.4); box-shadow: 0 0 0 3px rgba(56,189,248,.1); }
+#ts-page .ts-search::placeholder { color: #334155; }
+#ts-page .ts-search-wrap { position: relative; }
+#ts-page .ts-search-wrap i { position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); color: #334155; font-size: .8rem; }
+
+#ts-page .ts-table-wrap {
+    background: #0d1b2e; border: 1px solid rgba(255,255,255,.07);
+    border-radius: 16px; overflow: hidden;
+}
+#ts-page .ts-table { width: 100%; border-collapse: collapse; }
+#ts-page .ts-table thead tr {
+    background: rgba(56,189,248,.05);
+    border-bottom: 1px solid rgba(56,189,248,.12);
+}
+#ts-page .ts-table thead th {
+    padding: .85rem 1.2rem; text-align: left;
+    font-size: .7rem; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #38bdf8;
+}
+#ts-page .ts-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    transition: background .15s;
+}
+#ts-page .ts-table tbody tr:last-child { border-bottom: none; }
+#ts-page .ts-table tbody tr:hover { background: rgba(56,189,248,.04); }
+#ts-page .ts-table td { padding: .85rem 1.2rem; font-size: .84rem; color: #94a3b8; vertical-align: middle; }
+#ts-page .ts-table td.td-name { font-weight: 600; color: #e2e8f0; }
+#ts-page .ts-table td.td-adm { font-family: monospace; font-size: .78rem; color: #475569; }
+
+#ts-page .ts-badge {
+    display: inline-block; border-radius: 6px; padding: .18rem .6rem;
+    font-size: .68rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+}
+#ts-page .ts-badge-blue { background: rgba(56,189,248,.1); border: 1px solid rgba(56,189,248,.2); color: #38bdf8; }
+
+#ts-page .ts-empty {
+    background: #0d1b2e; border: 1px dashed rgba(56,189,248,.18);
+    border-radius: 16px; padding: 3.5rem 2rem; text-align: center;
+}
+#ts-page .ts-empty i { font-size: 2.2rem; color: #1e3a5f; display: block; margin-bottom: 1rem; }
+#ts-page .ts-empty h5 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: #94a3b8; margin-bottom: .4rem; }
+#ts-page .ts-empty p { font-size: .83rem; color: #334155; max-width: 300px; margin: 0 auto; }
+
+@media (max-width: 768px) {
+    .ts-subnav { padding: 0 .9rem; }
+    .ts-breadcrumb { display: none; }
+    #ts-page { padding: 1.4rem 1rem 4rem; }
+    #ts-page .ts-title { font-size: 1.6rem; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<nav class="ts-subnav">
+    <a href="{% url 'teachers:dashboard' %}" class="ts-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+    <div class="ts-nav-title">Subject Students</div>
+    <div class="ts-breadcrumb">
+        <a href="{% url 'teachers:dashboard' %}">Dashboard</a>
+        <i class="fas fa-chevron-right"></i>
+        <span style="color:#64748b;">{{ subject.name }}</span>
+        <i class="fas fa-chevron-right"></i>
+        <span style="color:#64748b;">Students</span>
+    </div>
+</nav>
+
+<div id="ts-page">
+
+    <div class="ts-hero mb-4">
+        <div class="ts-hero-inner">
+            <div class="ts-pg-label">Subject Students</div>
+            <h1 class="ts-title">{{ subject.name }}</h1>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="ts-pill"><i class="fas fa-school"></i> {{ school.name }}</span>
+                {% if subject.code %}<span class="ts-pill"><i class="fas fa-hashtag"></i> {{ subject.code }}</span>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="ts-stat-row">
+        <div class="ts-stat">
+            <div class="ts-stat-icon si-blue"><i class="fas fa-users"></i></div>
+            <div>
+                <div class="ts-stat-num">{{ enrollments.count }}</div>
+                <div class="ts-stat-lbl">Enrolled Students</div>
+            </div>
+        </div>
+        <div class="ts-stat">
+            <div class="ts-stat-icon si-green"><i class="fas fa-book-open"></i></div>
+            <div>
+                <div class="ts-stat-num">{{ subject.name|truncatechars:12 }}</div>
+                <div class="ts-stat-lbl">Subject</div>
+            </div>
+        </div>
+        <div class="ts-stat">
+            <div class="ts-stat-icon si-gold"><i class="fas fa-school"></i></div>
+            <div>
+                <div class="ts-stat-num" style="font-size:1rem;line-height:1.3;">{{ school.name|truncatechars:12 }}</div>
+                <div class="ts-stat-lbl">School</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ts-section-head">
+        <span class="sh-icon"><i class="fas fa-users"></i></span>
+        Enrolled Students
+        <a href="{% url 'teachers:subject_exams' subject.id %}" style="margin-left:auto;font-size:.78rem;font-weight:600;color:#38bdf8;text-decoration:none;display:flex;align-items:center;gap:.4rem;">
+            <i class="fas fa-file-alt"></i> View Exams &amp; Results
+        </a>
+    </div>
+
+    {% if enrollments %}
+    <div class="ts-search-wrap mb-3">
+        <i class="fas fa-search"></i>
+        <input type="text" class="ts-search" id="tsSearch" placeholder="Search by name or admission number…">
+    </div>
+
+    <div class="ts-table-wrap">
+        <table class="ts-table" id="tsTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Admission No</th>
+                    <th>Class</th>
+                    <th>Section</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for enrollment in enrollments %}
+                <tr>
+                    <td style="color:#334155;">{{ forloop.counter }}</td>
+                    <td class="td-name">{{ enrollment.student.first_name }} {{ enrollment.student.last_name }}</td>
+                    <td class="td-adm">{{ enrollment.student.admission_no }}</td>
+                    <td><span class="ts-badge ts-badge-blue">{{ enrollment.class_grade.name }}</span></td>
+                    <td style="color:#64748b;">{{ enrollment.section.name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="ts-empty">
+        <i class="fas fa-users"></i>
+        <h5>No Students Enrolled Yet</h5>
+        <p>No students are enrolled in {{ subject.name }} at {{ school.name }} yet.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+(function () {
+    var input = document.getElementById('tsSearch');
+    if (!input) return;
+    input.addEventListener('input', function () {
+        var q = this.value.toLowerCase();
+        var rows = document.querySelectorAll('#tsTable tbody tr');
+        rows.forEach(function (row) {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    });
+})();
+</script>
+{% endblock %}

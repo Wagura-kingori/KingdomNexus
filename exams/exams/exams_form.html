@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ exam.id|yesno:"Edit Exam,Add Exam" }}</h2>
+
+    <form method="POST" class="mt-3">
+        {% csrf_token %}
+
+        <label class="form-label">Exam Type</label>
+        <select name="exam_type" class="form-select mb-3">
+            {% for t in types %}
+            <option value="{{ t.id }}" {% if exam.exam_type_id==t.id %}selected{% endif %}>{{ t.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label class="form-label">Subject</label>
+        <select name="subject" class="form-select mb-3">
+            {% for s in subjects %}
+            <option value="{{ s.id }}" {% if exam.subject_id==s.id %}selected{% endif %}>{{ s.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label class="form-label">Class Level</label>
+        <input type="text" name="class_level" value="{{ exam.class_level }}" class="form-control mb-3">
+
+        <label class="form-label">Term</label>
+        <input type="text" name="term" value="{{ exam.term }}" class="form-control mb-3">
+
+        <label class="form-label">Date</label>
+        <input type="date" name="date" value="{{ exam.date|date:'Y-m-d' }}" class="form-control mb-3">
+
+        <button class="btn btn-success">Save</button>
+        <a href="{% url 'exams_list' %}" class="btn btn-secondary">Back</a>
+    </form>
+</div>
+{% endblock %}

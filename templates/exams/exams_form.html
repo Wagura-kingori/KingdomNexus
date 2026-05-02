@@ -1,0 +1,54 @@
+
+{% extends "exams/exams_base.html" %}
+{% block exam_title %}Edit Exam — {{ exam.name }}{% endblock %}
+{% block nav_exams %}active{% endblock %}
+
+{% block exam_content %}
+<div class="exm-page-header">
+    <div class="exm-pg-label">Exams</div>
+    <h1 class="exm-page-title">Edit: {{ exam.name|default:"Exam" }}</h1>
+</div>
+
+<div class="exm-card" style="max-width:700px;">
+    <div class="exm-card-head">
+        <span class="exm-card-icon"><i class="fas fa-pen"></i></span>
+        <h6>Edit Exam Details</h6>
+    </div>
+    <div class="exm-card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            <div class="exm-field">
+                <label class="exm-lbl">Exam Name</label>
+                <input type="text" name="name" value="{{ exam.name|default:'' }}" placeholder="Exam name" class="exm-input" autocomplete="off">
+            </div>
+            <div class="exm-grid-2">
+                <div class="exm-field" style="margin-bottom:0;">
+                    <label class="exm-lbl">Exam Type</label>
+                    <select name="exam_type" class="exm-select">
+                        <option value="">— Select type —</option>
+                        {% for t in types %}<option value="{{ t.id }}" {% if exam.exam_type_id == t.id %}selected{% endif %}>{{ t.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="exm-field" style="margin-bottom:0;">
+                    <label class="exm-lbl">Term</label>
+                    <input type="text" name="term" value="{{ exam.term|default:'' }}" placeholder="e.g. Term 1" class="exm-input">
+                </div>
+            </div>
+            <div class="exm-grid-2" style="margin-top:1.1rem;">
+                <div class="exm-field" style="margin-bottom:0;">
+                    <label class="exm-lbl">Year</label>
+                    <input type="number" name="year" value="{{ exam.year|default:'' }}" placeholder="2025" class="exm-input">
+                </div>
+                <div class="exm-field" style="margin-bottom:0;">
+                    <label class="exm-lbl">Date</label>
+                    <input type="date" name="date" value="{{ exam.date|default:'' }}" class="exm-input">
+                </div>
+            </div>
+            <div class="exm-actions" style="margin-top:1.4rem;">
+                <button type="submit" class="exm-btn exm-btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                <a href="{% url 'exams:exams_list' %}" class="exm-btn exm-btn-ghost"><i class="fas fa-times"></i> Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

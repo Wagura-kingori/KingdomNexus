@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Salary Components</h2>
+
+    <a href="#" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#componentModal">
+        Add Component
+    </a>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Default Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in components %}
+            <tr>
+                <td>{{ c.name }}</td>
+                <td>{{ c.kind|title }}</td>
+                <td>{{ c.default_amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Component Modal -->
+<div class="modal fade" id="componentModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5>Add Component</h5>
+                </div>
+                <div class="modal-body">
+                    {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

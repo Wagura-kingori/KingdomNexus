@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Payroll Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+    .dashboard-card {
+        border-radius: 14px;
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .15);
+    }
+
+    .icon-box {
+        font-size: 2.5rem;
+        opacity: .85;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .section-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Payroll Manager Dashboard</h2>
+            <p class="text-muted mb-0">
+                Welcome back, {{ request.user.get_full_name|default:request.user.username }}
+            </p>
+        </div>
+
+        <span class="badge bg-success fs-6 px-3 py-2">
+            Payroll Manager
+        </span>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-3">
+            <div class="card dashboard-card shadow-sm p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted">Total Employees</div>
+                        <div class="stat-number">{{ total_employees|default:"0" }}</div>
+                    </div>
+                    <div class="icon-box text-primary">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card dashboard-card shadow-sm p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted">Monthly Payroll</div>
+                        <div class="stat-number">KES {{ total_payroll|default:"0" }}</div>
+                    </div>
+                    <div class="icon-box text-success">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card dashboard-card shadow-sm p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted">Pending Payments</div>
+                        <div class="stat-number text-warning">{{ pending_payments|default:"0" }}</div>
+                    </div>
+                    <div class="icon-box text-warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card dashboard-card shadow-sm p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted">Approved Payrolls</div>
+                        <div class="stat-number text-info">{{ approved_payrolls|default:"0" }}</div>
+                    </div>
+                    <div class="icon-box text-info">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="section-title">Quick Actions</h5>
+        </div>
+
+        <div class="col-md-3">
+            <a href="/payroll/employees/" class="btn btn-outline-primary w-100 mb-2">
+                <i class="fas fa-user-tie me-2"></i> Manage Employees
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="/payroll/salaries/" class="btn btn-outline-success w-100 mb-2">
+                <i class="fas fa-file-invoice-dollar me-2"></i> Generate Salaries
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="/payroll/deductions/" class="btn btn-outline-warning w-100 mb-2">
+                <i class="fas fa-minus-circle me-2"></i> Deductions & Allowances
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="/payroll/reports/" class="btn btn-outline-dark w-100 mb-2">
+                <i class="fas fa-chart-line me-2"></i> Payroll Reports
+            </a>
+        </div>
+    </div>
+
+    <!-- RECENT PAYROLL ACTIVITY -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light fw-bold">
+            Recent Payroll Activity
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0 table-striped">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Employee</th>
+                        <th>Month</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payroll in recent_payrolls %}
+                    <tr>
+                        <td>{{ payroll.employee }}</td>
+                        <td>{{ payroll.month }}</td>
+                        <td>KES {{ payroll.amount }}</td>
+                        <td>
+                            {% if payroll.status == "approved" %}
+                            <span class="badge bg-success">Approved</span>
+                            {% elif payroll.status == "pending" %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ payroll.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">
+                            No payroll records found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

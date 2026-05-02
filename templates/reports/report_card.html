@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="card shadow">
+        <div class="card-body">
+
+            <div class="text-center mb-3">
+                <h3><strong>{{ student.school.name }}</strong></h3>
+                <p>{{ student.school.address }}</p>
+                <h4 class="mt-3">Student Report Card</h4>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Name:</strong> {{ student.full_name }}</p>
+                    <p><strong>Adm No:</strong> {{ student.admission_number }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Class:</strong> {{ student.classroom }}</p>
+                    <p><strong>Exam:</strong> {{ exam.name }} ({{ exam.exam_type.name }})</p>
+                </div>
+            </div>
+
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Subject</th>
+                        <th>Score</th>
+                        <th>Grade</th>
+                        <th>Remark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in results %}
+                    <tr>
+                        <td>{{ r.subject.name }}</td>
+                        <td>{{ r.score }}</td>
+                        <td>{{ r.grade }}</td>
+                        <td>{{ r.remark }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="mt-3">
+                <p><strong>Total Score:</strong> {{ total }}</p>
+                <p><strong>Average Score:</strong> {{ average }}</p>
+            </div>
+
+            <div class="text-end mt-4">
+                <a href="{% url 'report_card_pdf' student.id exam.id %}" class="btn btn-primary">
+                    Download PDF
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

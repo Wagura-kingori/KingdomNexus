@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+{% block title %}Create Exam — {{ subject.name }}{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body, body.light-mode, body.dark-mode { background-color: #080f1c !important; color: #e2e8f0 !important; }
+main.container { padding-top: 0 !important; max-width: 100% !important; padding-left: 0 !important; padding-right: 0 !important; }
+
+.ce-subnav {
+    background: rgba(10,20,38,.98); border-bottom: 1px solid rgba(56,189,248,.1);
+    backdrop-filter: blur(16px); display: flex; align-items: center;
+    height: 52px; padding: 0 1.6rem; gap: .8rem;
+    position: sticky; top: 60px; z-index: 900;
+}
+.ce-back {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .76rem; font-weight: 600; color: #64748b;
+    text-decoration: none !important; padding: .32rem .75rem;
+    border-radius: 8px; border: 1px solid rgba(255,255,255,.07); transition: all .15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.ce-back:hover { background: rgba(56,189,248,.08); color: #38bdf8; border-color: rgba(56,189,248,.2); }
+.ce-back i { font-size: .7rem; }
+.ce-nav-title { font-size: .7rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #38bdf8; flex: 1; }
+.ce-breadcrumb { font-size: .73rem; color: #334155; display: flex; align-items: center; gap: .4rem; }
+.ce-breadcrumb a { color: #475569; text-decoration: none; }
+.ce-breadcrumb a:hover { color: #38bdf8; }
+.ce-breadcrumb i { font-size: .55rem; }
+
+#ce-page {
+    font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0;
+    padding: 2rem 1.8rem 5rem; max-width: 780px; margin: 0 auto;
+    animation: ceFadeUp .4s ease both;
+}
+@keyframes ceFadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+#ce-page .ce-header {
+    margin-bottom: 2rem; padding-bottom: 1.4rem;
+    border-bottom: 1px solid rgba(56,189,248,.1);
+}
+#ce-page .ce-pg-label {
+    font-size: .68rem; font-weight: 700; letter-spacing: 2.8px;
+    text-transform: uppercase; color: #38bdf8; margin-bottom: .4rem;
+    display: flex; align-items: center; gap: .4rem;
+}
+#ce-page .ce-pg-label::before { content: ''; width: 14px; height: 2px; background: #38bdf8; border-radius: 2px; }
+#ce-page .ce-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700;
+    color: #f0f9ff; margin: 0 0 .5rem; line-height: 1.15;
+}
+#ce-page .ce-sub { font-size: .82rem; color: #475569; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+#ce-page .ce-sub i { color: #38bdf8; font-size: .75rem; }
+#ce-page .ce-sub span { color: #64748b; }
+
+#ce-page .ce-alert {
+    border-radius: 12px; padding: .85rem 1.1rem; font-size: .83rem; font-weight: 500;
+    margin-bottom: 1rem; display: flex; align-items: flex-start; gap: .7rem; border: 1px solid;
+    animation: ceFadeUp .3s ease both;
+}
+#ce-page .ce-alert i { font-size: .85rem; flex-shrink: 0; margin-top: .1rem; }
+#ce-page .ce-alert-error { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.2); color: #fca5a5; }
+
+#ce-page .ce-card {
+    background: #0d1b2e; border: 1px solid rgba(255,255,255,.07);
+    border-radius: 18px; overflow: hidden; margin-bottom: 1.4rem;
+}
+#ce-page .ce-card-head {
+    padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,.06);
+    background: rgba(56,189,248,.04); display: flex; align-items: center; gap: .7rem;
+}
+#ce-page .ce-card-head .ch-icon {
+    width: 30px; height: 30px; background: rgba(56,189,248,.1);
+    border: 1px solid rgba(56,189,248,.2); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; color: #38bdf8; flex-shrink: 0;
+}
+#ce-page .ce-card-head h6 {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 700;
+    color: #f1f5f9; margin: 0;
+}
+#ce-page .ce-card-body { padding: 1.6rem 1.5rem; }
+
+#ce-page .ce-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
+#ce-page .ce-row-full { margin-bottom: 1.2rem; }
+#ce-page .ce-row:last-child, #ce-page .ce-row-full:last-child { margin-bottom: 0; }
+
+#ce-page .ce-field { display: flex; flex-direction: column; }
+#ce-page .ce-lbl {
+    font-size: .72rem; font-weight: 700; color: #64748b;
+    letter-spacing: .5px; text-transform: uppercase; margin-bottom: .45rem;
+}
+#ce-page .ce-lbl .ce-req { color: #f87171; margin-left: .2rem; }
+
+#ce-page .ce-input,
+#ce-page .ce-select,
+#ce-page .ce-textarea {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+    padding: .68rem 1rem; font-size: .87rem;
+    font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0;
+    transition: border-color .2s, box-shadow .2s; outline: none;
+    -webkit-appearance: none;
+}
+#ce-page .ce-input:focus,
+#ce-page .ce-select:focus,
+#ce-page .ce-textarea:focus {
+    border-color: rgba(56,189,248,.45); background: rgba(56,189,248,.04);
+    box-shadow: 0 0 0 3px rgba(56,189,248,.1);
+}
+#ce-page .ce-input::placeholder,
+#ce-page .ce-textarea::placeholder { color: #334155; }
+#ce-page .ce-select { cursor: pointer; }
+#ce-page .ce-select option { background: #0d1b2e; color: #e2e8f0; }
+#ce-page .ce-textarea { resize: vertical; min-height: 80px; }
+
+#ce-page .ce-input.has-error,
+#ce-page .ce-select.has-error,
+#ce-page .ce-textarea.has-error { border-color: rgba(239,68,68,.4) !important; }
+
+#ce-page .ce-field-error {
+    font-size: .73rem; color: #fca5a5; margin-top: .35rem;
+    display: flex; align-items: center; gap: .3rem;
+}
+#ce-page .ce-field-error i { font-size: .68rem; }
+
+#ce-page .ce-hint { font-size: .72rem; color: #334155; margin-top: .35rem; }
+
+#ce-page .ce-divider { height: 1px; background: linear-gradient(90deg, rgba(56,189,248,.15), transparent); margin: .4rem 0 1.2rem; }
+
+#ce-page .ce-actions { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; padding-top: .4rem; }
+#ce-page .ce-btn {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .82rem; font-weight: 600; font-family: 'Plus Jakarta Sans', sans-serif;
+    border-radius: 10px; padding: .55rem 1.3rem; cursor: pointer; border: 1px solid;
+    transition: all .2s; text-decoration: none !important; letter-spacing: .15px;
+}
+#ce-page .ce-btn-primary {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8); border-color: transparent;
+    color: #fff; box-shadow: 0 4px 14px rgba(14,165,233,.3);
+}
+#ce-page .ce-btn-primary:hover {
+    background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff;
+    box-shadow: 0 6px 22px rgba(14,165,233,.4); transform: translateY(-1px);
+}
+#ce-page .ce-btn-ghost { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); color: #64748b; }
+#ce-page .ce-btn-ghost:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); color: #e2e8f0; }
+#ce-page .ce-btn-tip { font-size: .74rem; color: #334155; margin-left: auto; display: flex; align-items: center; gap: .35rem; }
+#ce-page .ce-btn-tip i { color: #1e3a5f; }
+
+@media (max-width: 640px) {
+    .ce-subnav { padding: 0 .9rem; }
+    .ce-breadcrumb { display: none; }
+    #ce-page { padding: 1.4rem 1rem 4rem; }
+    #ce-page .ce-title { font-size: 1.6rem; }
+    #ce-page .ce-row { grid-template-columns: 1fr; }
+    #ce-page .ce-actions { flex-direction: column; align-items: stretch; }
+    #ce-page .ce-btn { justify-content: center; }
+    #ce-page .ce-btn-tip { margin-left: 0; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<nav class="ce-subnav">
+    <a href="{% url 'teachers:subject_exams' subject.id %}" class="ce-back">
+        <i class="fas fa-arrow-left"></i> Back to Exams
+    </a>
+    <div class="ce-nav-title">Create Exam</div>
+    <div class="ce-breadcrumb">
+        <a href="{% url 'teachers:dashboard' %}">Dashboard</a>
+        <i class="fas fa-chevron-right"></i>
+        <a href="{% url 'teachers:subject_exams' subject.id %}">{{ subject.name }}</a>
+        <i class="fas fa-chevron-right"></i>
+        <span style="color:#64748b;">Create Exam</span>
+    </div>
+</nav>
+
+<div id="ce-page">
+
+    <div class="ce-header">
+        <div class="ce-pg-label">New Exam</div>
+        <h1 class="ce-title">Create an Exam</h1>
+        <div class="ce-sub">
+            <i class="fas fa-book-open"></i>
+            <span>Subject:</span> {{ subject.name }}
+            {% if subject.code %}&nbsp;·&nbsp; <i class="fas fa-hashtag"></i> <span>{{ subject.code }}</span>{% endif %}
+            &nbsp;·&nbsp; <i class="fas fa-school"></i> <span>{{ school.name }}</span>
+        </div>
+    </div>
+
+    {% if form.non_field_errors %}
+        <div class="ce-alert ce-alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <div>{% for err in form.non_field_errors %}{{ err }}{% endfor %}</div>
+        </div>
+    {% endif %}
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="ce-card">
+            <div class="ce-card-head">
+                <span class="ch-icon"><i class="fas fa-file-alt"></i></span>
+                <h6>Exam Details</h6>
+            </div>
+            <div class="ce-card-body">
+
+                <div class="ce-row-full">
+                    <div class="ce-field">
+                        <label class="ce-lbl" for="{{ form.name.id_for_label }}">
+                            Exam Name <span class="ce-req">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="{{ form.name.html_name }}"
+                            id="{{ form.name.id_for_label }}"
+                            value="{{ form.name.value|default:'' }}"
+                            placeholder="e.g. End of Term 1 Exam 2025"
+                            class="ce-input {% if form.name.errors %}has-error{% endif %}"
+                            autocomplete="off"
+                        >
+                        {% for err in form.name.errors %}
+                            <div class="ce-field-error"><i class="fas fa-exclamation-circle"></i> {{ err }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="ce-row">
+                    <div class="ce-field">
+                        <label class="ce-lbl" for="{{ form.exam_type.id_for_label }}">
+                            Exam Type <span class="ce-req">*</span>
+                        </label>
+                        <select
+                            name="{{ form.exam_type.html_name }}"
+                            id="{{ form.exam_type.id_for_label }}"
+                            class="ce-select {% if form.exam_type.errors %}has-error{% endif %}"
+                        >
+                            <option value="">— Select type —</option>
+                            {% for choice_val, choice_label in form.exam_type.field.choices %}
+                                {% if choice_val %}
+                                    <option value="{{ choice_val }}" {% if form.exam_type.value|stringformat:"s" == choice_val|stringformat:"s" %}selected{% endif %}>
+                                        {{ choice_label }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        {% for err in form.exam_type.errors %}
+                            <div class="ce-field-error"><i class="fas fa-exclamation-circle"></i> {{ err }}</div>
+                        {% endfor %}
+                        <div class="ce-hint">
+                            <a href="{% url 'exams:exam_type_create' %}" target="_blank"
+                               style="color:#38bdf8;font-size:.72rem;text-decoration:none;">
+                                <i class="fas fa-plus me-1"></i>Add a new exam type
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="ce-field">
+                        <label class="ce-lbl" for="{{ form.term.id_for_label }}">
+                            Term <span class="ce-req">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="{{ form.term.html_name }}"
+                            id="{{ form.term.id_for_label }}"
+                            value="{{ form.term.value|default:'' }}"
+                            placeholder="e.g. Term 1"
+                            class="ce-input {% if form.term.errors %}has-error{% endif %}"
+                            autocomplete="off"
+                        >
+                        {% for err in form.term.errors %}
+                            <div class="ce-field-error"><i class="fas fa-exclamation-circle"></i> {{ err }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="ce-row">
+                    <div class="ce-field">
+                        <label class="ce-lbl" for="{{ form.year.id_for_label }}">
+                            Year <span class="ce-req">*</span>
+                        </label>
+                        <input
+                            type="number"
+                            name="{{ form.year.html_name }}"
+                            id="{{ form.year.id_for_label }}"
+                            value="{{ form.year.value|default:'' }}"
+                            placeholder="e.g. 2025"
+                            min="2000" max="2100"
+                            class="ce-input {% if form.year.errors %}has-error{% endif %}"
+                        >
+                        {% for err in form.year.errors %}
+                            <div class="ce-field-error"><i class="fas fa-exclamation-circle"></i> {{ err }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="ce-field">
+                        <label class="ce-lbl" for="{{ form.date.id_for_label }}">
+                            Exam Date
+                        </label>
+                        <input
+                            type="date"
+                            name="{{ form.date.html_name }}"
+                            id="{{ form.date.id_for_label }}"
+                            value="{{ form.date.value|default:'' }}"
+                            class="ce-input {% if form.date.errors %}has-error{% endif %}"
+                        >
+                        {% for err in form.date.errors %}
+                            <div class="ce-field-error"><i class="fas fa-exclamation-circle"></i> {{ err }}</div>
+                        {% endfor %}
+                        <div class="ce-hint">Optional — leave blank if date is not yet set.</div>
+                    </div>
+                </div>
+
+                <div class="ce-divider"></div>
+
+                <div class="ce-row-full">
+                    <div class="ce-field">
+                        <label class="ce-lbl" for="{{ form.description.id_for_label }}">
+                            Description
+                        </label>
+                        <textarea
+                            name="{{ form.description.html_name }}"
+                            id="{{ form.description.id_for_label }}"
+                            placeholder="Optional notes about this exam…"
+                            class="ce-textarea {% if form.description.errors %}has-error{% endif %}"
+                        >{{ form.description.value|default:'' }}</textarea>
+                        {% for err in form.description.errors %}
+                            <div class="ce-field-error"><i class="fas fa-exclamation-circle"></i> {{ err }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="ce-actions">
+            <button type="submit" class="ce-btn ce-btn-primary">
+                <i class="fas fa-save"></i> Create Exam
+            </button>
+            <a href="{% url 'teachers:subject_exams' subject.id %}" class="ce-btn ce-btn-ghost">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+            <div class="ce-btn-tip">
+                <i class="fas fa-info-circle"></i>
+                After creating, you can enter student results immediately.
+            </div>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}

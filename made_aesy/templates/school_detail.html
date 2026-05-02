@@ -1,0 +1,496 @@
+{% extends 'church_base.html' %}
+{% load static %}
+
+{% block title %}{{ school.name }} — ACK Schools{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* visuals */
+    :root {
+        --primary: #ff7b59;
+        --muted: #f6f2ef;
+        --card-radius: 14px;
+        --shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 30px auto;
+        padding: 0 18px;
+    }
+
+    /* hero */
+    .hero {
+        background: linear-gradient(135deg, var(--primary), #ff9a7b);
+        color: #fff;
+        border-radius: 18px;
+        padding: 36px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        margin-bottom: 28px;
+    }
+
+    .hero h1 {
+        margin: 0;
+        font-size: 2.4rem;
+        font-weight: 700;
+    }
+
+    .hero p {
+        margin-top: 10px;
+        opacity: 0.95;
+    }
+
+    /* stats row */
+    .row-stats {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #ffd3b6, #ffb89c);
+        border-radius: var(--card-radius);
+        width: 240px;
+        padding: 20px;
+        color: #fff;
+        text-align: center;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        transition: transform .22s ease, box-shadow .22s ease;
+        user-select: none;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-card i {
+        font-size: 2.2rem;
+        margin-bottom: 8px;
+    }
+
+    .stat-card .count {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .stat-card .label {
+        margin-top: 6px;
+        font-weight: 600;
+    }
+
+    /* controls above table */
+    .table-controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        margin: 20px 0;
+        flex-wrap: wrap;
+    }
+
+    .search-input,
+    .filter-select {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #e6e2df;
+        background: #fff;
+        min-width: 180px;
+    }
+
+    .small-btn {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        background: var(--primary);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .small-btn.loading {
+        pointer-events: none;
+        opacity: 0.8;
+    }
+
+    .small-btn.loading::after {
+        content: "\f110";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-left: 8px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .table-card {
+        background: var(--muted);
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        margin-bottom: 36px;
+
+        /* animation */
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition: max-height 0.4s ease, opacity 0.4s ease;
+    }
+
+    .table-card.show {
+        max-height: 2000px;
+        opacity: 1;
+    }
+
+    #detail-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #detail-table th,
+    #detail-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+
+    #detail-table thead th {
+        background: var(--primary);
+        color: #fff;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+
+        /* Slide in */
+        opacity: 0;
+        transform: translateY(-10px);
+        animation: slideDown 0.4s ease forwards;
+    }
+
+    tbody tr {
+        opacity: 0;
+        transform: translateY(15px);
+        animation: slideUp 0.45s ease forwards;
+    }
+
+    tbody tr:nth-child(even) {
+        animation-delay: .05s;
+    }
+
+    tbody tr:nth-child(odd) {
+        animation-delay: .07s;
+    }
+
+    @keyframes slideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideDown {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .pagination {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: center;
+        margin-top: 14px;
+    }
+
+    .page-btn {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #e6e2df;
+        background: #fff;
+        cursor: pointer;
+    }
+
+    .page-btn.active {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+    }
+
+    @media(max-width:768px) {
+        .stat-card {
+            width: 100%;
+            max-width: 360px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero">
+        <h1>{{ school.name }}</h1>
+        {% if school.description %}
+        <p>{{ school.description }}</p>
+        {% endif %}
+    </div>
+
+    <div class="row-stats">
+        <div class="stat-card" onclick="initLoad('students')">
+            <i class="fas fa-user-graduate"></i>
+            <div class="count">{{ student_count }}</div>
+            <div class="label">Students</div>
+        </div>
+
+        <div class="stat-card" onclick="initLoad('teachers')">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <div class="count">{{ teacher_count }}</div>
+            <div class="label">Teachers</div>
+        </div>
+
+        <div class="stat-card" onclick="initLoad('achievements')">
+            <i class="fas fa-award"></i>
+            <div class="count">{{ achievement_count }}</div>
+            <div class="label">Achievements</div>
+        </div>
+    </div>
+
+    <div class="table-controls" id="tableControls" style="display:none;">
+        <div class="controls-left">
+            <input type="text" id="globalSearch" class="search-input" placeholder="Search..." />
+            <select id="dynamicFilter" class="filter-select" style="display:none;">
+                <option value="">All</option>
+            </select>
+            <select id="perPage" class="filter-select" onchange="fetchPage(1)">
+                <option value="5">5 / page</option>
+                <option value="10" selected>10 / page</option>
+                <option value="25">25 / page</option>
+            </select>
+        </div>
+
+        <div class="controls-right">
+            <button class="small-btn" id="refreshBtn" onclick="refreshNow()">Refresh</button>
+            <a href="{% url 'schools_list' %}" class="small-btn" style="background:#6c757d;">Back</a>
+        </div>
+    </div>
+
+    <div class="table-card" id="tableCard">
+        <table id="detail-table">
+            <thead>
+                <tr id="tableHead"></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+        <div class="pagination" id="paginationControls" style="display:none;"></div>
+    </div>
+</div>
+
+<script>
+    const endpoints = {
+        students: '{% url "load_students" school.pk %}',
+        teachers: '{% url "load_teachers" school.pk %}',
+        achievements: '{% url "load_achievements" school.pk %}'
+    };
+
+    let currentType = null;
+    let currentPage = 1;
+    let currentQuery = '';
+    let currentFilter = '';
+
+    function initLoad(type) {
+        currentType = type;
+
+        document.getElementById("tableControls").style.display = "flex";
+
+        const tableCard = document.getElementById("tableCard");
+        tableCard.classList.add("show");
+
+        document.getElementById("globalSearch").value = "";
+        currentFilter = "";
+        setupFilterForType(type);
+
+        fetchPage(1);
+    }
+
+    /* REFRESH BUTTON WITH LOADER */
+    function refreshNow() {
+        const btn = document.getElementById("refreshBtn");
+
+        btn.classList.add("loading");
+
+        setTimeout(() => {
+            fetchPage(1).then(() => {
+                btn.classList.remove("loading");
+            });
+        }, 300);
+    }
+
+    function setupFilterForType(type) {
+        const dyn = document.getElementById('dynamicFilter');
+        dyn.style.display = 'none';
+        dyn.innerHTML = '<option value="">All</option>';
+
+        if (type === 'students') {
+            dyn.style.display = 'inline-block';
+            const grades = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8'];
+            grades.forEach(g => dyn.insertAdjacentHTML('beforeend', `<option value="${g}">${g}</option>`));
+        }
+        else if (type === 'teachers') {
+            dyn.style.display = 'inline-block';
+            const subjects = ['Math', 'English', 'Science', 'History', 'Geography', 'CRE'];
+            subjects.forEach(s => dyn.insertAdjacentHTML('beforeend', `<option value="${s}">${s}</option>`));
+        }
+        else if (type === 'achievements') {
+            dyn.style.display = 'inline-block';
+            const year = new Date().getFullYear();
+            for (let y = year; y >= year - 10; y--) {
+                dyn.insertAdjacentHTML('beforeend', `<option value="${y}">${y}</option>`);
+            }
+        }
+
+        dyn.onchange = () => {
+            currentFilter = dyn.value;
+            fetchPage(1);
+        };
+    }
+
+    function fetchPage(page = 1) {
+        currentPage = page;
+        currentQuery = document.getElementById("globalSearch").value.trim();
+        const perPage = document.getElementById("perPage").value;
+
+        const params = new URLSearchParams({
+            page: page,
+            per_page: perPage
+        });
+
+        if (currentQuery) params.append("q", currentQuery);
+        if (currentFilter) {
+            if (currentType === "students") params.append("grade", currentFilter);
+            if (currentType === "teachers") params.append("subject", currentFilter);
+            if (currentType === "achievements") params.append("year", currentFilter);
+        }
+
+        return fetch(endpoints[currentType] + "?" + params.toString())
+            .then(res => res.json())
+            .then(json => renderTable(json))
+            .catch(() => {
+                document.getElementById("tableBody").innerHTML =
+                    `<tr><td colspan="5">Error loading data</td></tr>`;
+            });
+    }
+
+    function renderTable(json) {
+        const head = document.getElementById("tableHead");
+        const body = document.getElementById("tableBody");
+        const pagination = document.getElementById("paginationControls");
+
+        head.innerHTML = "";
+        body.innerHTML = "";
+        pagination.innerHTML = "";
+
+        if (!Array.isArray(json.data)) {
+            head.innerHTML = "<th>No Data</th>";
+            return;
+        }
+
+        /* STUDENTS */
+        if (currentType === "students") {
+            head.innerHTML = `
+                <th>Name</th>
+                <th>Age</th>
+                <th>Class Level</th>
+                <th>Admission No</th>
+            `;
+            json.data.forEach(s => {
+                body.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${escapeHtml(s.full_name)}</td>
+                        <td>${escapeHtml(s.age)}</td>
+                        <td>${escapeHtml(s.class_level)}</td>
+                        <td>${escapeHtml(s.admission_number)}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        /* TEACHERS */
+        else if (currentType === "teachers") {
+            head.innerHTML = `
+                <th>Name</th>
+                <th>Subject</th>
+            `;
+            json.data.forEach(t => {
+                body.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${escapeHtml(t.full_name)}</td>
+                        <td>${escapeHtml(t.subject)}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        /* ACHIEVEMENTS */
+        else if (currentType === "achievements") {
+            head.innerHTML = `
+                <th>Title</th>
+                <th>Description</th>
+                <th>Year</th>
+            `;
+            json.data.forEach(a => {
+                body.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${escapeHtml(a.title)}</td>
+                        <td>${escapeHtml(a.description)}</td>
+                        <td>${escapeHtml(a.year)}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        /* PAGINATION */
+        if (json.num_pages > 1) {
+            pagination.style.display = "flex";
+            pagination.insertAdjacentHTML(
+                "beforeend",
+                `<button class="page-btn" ${json.has_previous ? '' : 'disabled'} onclick="fetchPage(${json.page - 1})">Prev</button>`
+            );
+
+            const start = Math.max(1, json.page - 3);
+            const end = Math.min(json.num_pages, json.page + 3);
+
+            for (let p = start; p <= end; p++) {
+                pagination.insertAdjacentHTML(
+                    "beforeend",
+                    `<button class="page-btn ${p === json.page ? 'active' : ''}" onclick="fetchPage(${p})">${p}</button>`
+                );
+            }
+
+            pagination.insertAdjacentHTML(
+                "beforeend",
+                `<button class="page-btn" ${json.has_next ? '' : 'disabled'} onclick="fetchPage(${json.page + 1})">Next</button>`
+            );
+        }
+    }
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return "";
+        return String(str)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll("\"", "&quot;")
+            .replaceAll("'", "&#39;");
+    }
+</script>
+{% endblock %}

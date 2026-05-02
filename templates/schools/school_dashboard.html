@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>{{ school.name }} Dashboard</h2>
+
+<ul>
+    <li><a href="{% url 'users:add_user' school.id 'teacher' %}">Add Teacher</a></li>
+    <li><a href="{% url 'users:add_user' school.id 'student' %}">Add Student</a></li>
+    <li><a href="{% url 'users:add_user' school.id 'parent' %}">Add Parent</a></li>
+    <li><a href="{% url 'users:add_user' school.id 'payroll' %}">Add Payroll Staff</a></li>
+</ul>
+
+
+
+{% endblock %}

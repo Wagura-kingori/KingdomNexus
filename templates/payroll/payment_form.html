@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Record Payment for {{ payslip.employee.name }} ({{ payslip.period.name }})</h3>
+
+    <form method="post" class="card p-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button class="btn btn-success">Submit Payment</button>
+        <a href="{% url 'payroll:payslip_detail' payslip.id %}" class="btn btn-secondary">Back</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>System Setup</h2>
+<p>Use this interface to configure the system.</p>
+
+<hr>
+
+<h3>Schools</h3>
+<a href="{% url 'schools:add_school' %}" class="btn btn-primary">
+    ➕ Add School
+</a>
+
+
+<ul>
+    {% for school in schools %}
+    <li>
+        {{ school.name }} — {{ school.location }}
+    </li>
+    {% empty %}
+    <li>No schools added yet</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h3>Setup Order</h3>
+<ol>
+    <li>Create School</li>
+    <li>Add School Admin</li>
+    <li>Add Classes</li>
+    <li>Add Subjects</li>
+    <li>Add Teachers</li>
+    <li>Add Students</li>
+    <li>Add Parents</li>
+    <li>Setup Payroll</li>
+</ol>
+{% endblock %}

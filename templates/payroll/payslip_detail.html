@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Payslip — {{ payslip.employee.name }} — {{ payslip.period.name }}</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Amount</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in payslip.lines.all %}
+            <tr>
+                <td>{{ line.component.name if line.component else "Tax/Other" }}</td>
+                <td>{{ line.amount }}</td>
+                <td>{{ "Deduction" if line.is_deduction else "Earning" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p><strong>Gross:</strong> {{ payslip.gross }}</p>
+    <p><strong>Total Deductions:</strong> {{ payslip.total_deductions }}</p>
+    <p><strong>Net Pay:</strong> {{ payslip.net_pay }}</p>
+
+    <a href="{% url 'payroll:record_payment' payslip.id %}" class="btn btn-success">Record Payment</a>
+    <a href="{% url 'payroll:payslip_pdf' payslip.id %}" class="btn btn-danger">Download PDF</a>
+
+</div>
+{% endblock %}

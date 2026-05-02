@@ -1,0 +1,47 @@
+
+{% extends "exams/exams_base.html" %}
+{% block exam_title %}{% if result.pk %}Edit Result{% else %}Add Result{% endif %}{% endblock %}
+{% block nav_results %}active{% endblock %}
+
+{% block exam_content %}
+<div class="exm-page-header">
+    <div class="exm-pg-label">Results</div>
+    <h1 class="exm-page-title">{% if result.pk %}Edit Result{% else %}Add Result{% endif %}</h1>
+</div>
+
+<div class="exm-card" style="max-width:580px;">
+    <div class="exm-card-head">
+        <span class="exm-card-icon"><i class="fas fa-chart-bar"></i></span>
+        <h6>Result Details</h6>
+    </div>
+    <div class="exm-card-body">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            <div class="exm-field">
+                <label class="exm-lbl">Exam</label>
+                <select name="exam" class="exm-select">
+                    <option value="">— Select exam —</option>
+                    {% for e in exams %}<option value="{{ e.id }}" {% if result.exam_id == e.id %}selected{% endif %}>{{ e.name }} — {{ e.term }} {{ e.year }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="exm-field">
+                <label class="exm-lbl">Student</label>
+                <select name="student" class="exm-select">
+                    <option value="">— Select student —</option>
+                    {% for s in students %}<option value="{{ s.id }}" {% if result.student_id == s.id %}selected{% endif %}>{{ s.first_name }} {{ s.last_name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="exm-field">
+                <label class="exm-lbl">Score (0–100)</label>
+                <input type="number" name="score" value="{{ result.score|default:'' }}" min="0" max="100" step="0.5" class="exm-input" placeholder="e.g. 85">
+            </div>
+            <div class="exm-actions">
+                <button type="submit" class="exm-btn exm-btn-primary"><i class="fas fa-save"></i> Save</button>
+                <a href="{% url 'exams:results_list' %}" class="exm-btn exm-btn-ghost"><i class="fas fa-times"></i> Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Payslips</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Period</th>
+                <th>Gross</th>
+                <th>Net</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for slip in payslips %}
+            <tr>
+                <td>{{ slip.employee }}</td>
+                <td>{{ slip.period }}</td>
+                <td>{{ slip.gross }}</td>
+                <td>{{ slip.net_pay }}</td>
+                <td><a href="{% url 'payroll:payslip_detail' slip.id %}" class="btn btn-sm btn-primary">View</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'church_base.html' %}
+{% block title %}{{ sermon.title }} — ACK Church{% endblock %}
+
+{% block content %}
+<h1>{{ sermon.title }}</h1>
+<p><strong>Date:</strong> {{ sermon.date }} | <strong>Preacher:</strong> {{ sermon.preacher }}</p>
+<div style="margin-top:20px;">
+    {% if sermon.video_url %}
+    <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;">
+        <iframe src="{{ sermon.video_url }}" frameborder="0"
+            style="position:absolute; top:0; left:0; width:100%; height:100%;" allowfullscreen></iframe>
+    </div>
+    {% endif %}
+</div>
+{% if sermon.notes %}
+<div style="margin-top:20px; padding:10px; background-color:#f8f9fa; border-radius:5px;">
+    <h3>Sermon Notes:</h3>
+    <p>{{ sermon.notes }}</p>
+</div>
+{% endif %}
+<a href="{% url 'sermons' %}" style="display:inline-block; margin-top:20px; color:#007bff;">Back to Sermons</a>
+{% endblock %}

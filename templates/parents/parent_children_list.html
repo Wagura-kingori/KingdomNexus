@@ -1,0 +1,16 @@
+{% extends 'dashboard_base.html' %}
+{% block content %}
+<h2>My Children</h2>
+
+<ul class="list-group">
+    {% for child in children %}
+    <li class="list-group-item d-flex justify-content-between">
+        <span>{{ child.first_name }} {{ child.last_name }} ({{ child.classroom.name }})</span>
+        <a href="{% url 'parent_child_detail' child.id %}" class="btn btn-primary btn-sm">Open</a>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-center">No children assigned.</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

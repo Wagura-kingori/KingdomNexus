@@ -1,0 +1,343 @@
+{% extends 'church_base.html' %}
+
+{% block extra_head %}
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    body {
+        background: radial-gradient(circle at top, #dfeaff, #f5f9ff 40%, #fff 80%);
+        min-height: 100vh;
+        padding-top: 40px;
+    }
+
+    /* Centered floating toast */
+    .center-toast {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(220, 53, 69, 0.92);
+        /* Bootstrap danger red but elegant */
+        color: white;
+        padding: 18px 28px;
+        border-radius: 12px;
+        font-size: 17px;
+        font-weight: 600;
+        z-index: 9999;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        opacity: 0;
+        animation: fadeInOut 4s ease forwards;
+    }
+
+    @keyframes fadeInOut {
+        0% {
+            opacity: 0;
+            transform: translate(-50%, -45%);
+        }
+
+        10% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+
+        90% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+
+        100% {
+            opacity: 0;
+            transform: translate(-50%, -55%);
+        }
+    }
+
+
+    .donation-card {
+        max-width: 680px;
+        margin: auto;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(12px);
+        border-radius: 25px;
+        padding: 45px 50px;
+        box-shadow: 0 20px 50px rgba(0, 0, 80, 0.1);
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    /* Floating circles */
+    .donation-card:before,
+    .donation-card:after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.25;
+        animation: float 6s infinite ease-in-out;
+    }
+
+    .donation-card:before {
+        width: 180px;
+        height: 180px;
+        background: #0d6efd;
+        top: -60px;
+        right: -70px;
+        animation-delay: 0.5s;
+    }
+
+    .donation-card:after {
+        width: 150px;
+        height: 150px;
+        background: #0dcaf0;
+        bottom: -50px;
+        left: -60px;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(10px);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Title styles */
+    .title {
+        font-size: 34px;
+        font-weight: 800;
+        color: #003a8c;
+    }
+
+    .subtitle {
+        color: #5c6f91;
+        font-size: 17px;
+    }
+
+    /* Floating label input style */
+    .form-control {
+        border: 1px solid #c8d4ff;
+        border-radius: 10px;
+        padding: 14px;
+        height: 56px;
+        font-size: 16px;
+        background: #f8faff;
+        transition: 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.2);
+        background: white;
+    }
+
+    .label-icon {
+        color: #0d6efd;
+        font-size: 22px;
+        margin-right: 10px;
+    }
+
+    .donate-btn {
+        height: 58px;
+        background: linear-gradient(135deg, #0d6efd, #00b3ff);
+        border: none;
+        color: white;
+        font-size: 19px;
+        font-weight: 600;
+        border-radius: 14px;
+        margin-top: 10px;
+        box-shadow: 0 10px 25px rgba(0, 123, 255, 0.3);
+        transition: 0.25s ease;
+    }
+
+    .donate-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 123, 255, 0.45);
+    }
+
+    .impact-box {
+        background: #eef5ff;
+        border-left: 5px solid #0d6efd;
+        padding: 15px 18px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #32507a;
+    }
+
+    .impact-box i {
+        color: #0d6efd;
+        margin-right: 7px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="donation-card">
+
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <i class="bi bi-hand-index-thumb text-primary" style="font-size: 55px;"></i>
+        <h2 class="title mt-2">Make a Difference Today</h2>
+        <p class="subtitle">Your generosity helps us spread God’s love, support ministries, and transform lives.</p>
+    </div>
+
+    <!-- Impact Box -->
+    <div class="impact-box">
+        <i class="bi bi-check-circle-fill"></i>
+        Your donation supports church programs, outreach missions, youth ministry, charity work, and building the
+        kingdom of God.
+    </div>
+
+    <!-- Django Toast -->
+    {% if messages %}
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        {% for message in messages %}
+        <div class="toast text-white {{ message.tags }} border-0 mb-2" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">{{ message }}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Form -->
+    <form id="payment-form">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="fw-semibold mb-1"><i class="bi bi-person-circle label-icon"></i>Your Name</label>
+            <input name="name" class="form-control" placeholder="John Doe" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-semibold mb-1"><i class="bi bi-envelope label-icon"></i>Email Address</label>
+            <input name="email" type="email" class="form-control" placeholder="johndoe@mail.com" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-semibold mb-1"><i class="bi bi-cash-stack label-icon"></i>Amount (KES)</label>
+            <input name="amount" type="number" step="0.01" class="form-control" placeholder="1000" required>
+        </div>
+
+        <button id="submit" class="donate-btn form-control">
+            <i class="bi bi-gift-fill"></i> Donate Now
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // -------------------------------
+    // Beautiful Centered Toast
+    // -------------------------------
+    function showCenteredToast(message, color = "rgba(220, 53, 69, 0.92)") {
+        const t = document.createElement("div");
+        t.className = "center-toast";
+        t.style.background = color;
+        t.innerHTML = message;
+        document.body.appendChild(t);
+
+        // Remove after fade-out
+        setTimeout(() => t.remove(), 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById("payment-form");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // -------------------------------
+            // Offline Detection
+            // -------------------------------
+            if (!navigator.onLine) {
+                showCenteredToast("You appear to be offline. Please reconnect to continue.");
+                return; // Stop submission
+            }
+
+            const name = form.name.value;
+            const email = form.email.value;
+            const amount = form.amount.value * 100; // convert KES to kobo
+
+            let handler = PaystackPop.setup({
+                key: "{{ PAYSTACK_PUBLIC_KEY }}",
+                email: email,
+                amount: amount,
+                currency: "KES",
+
+                metadata: {
+                    custom_fields: [
+                        {
+                            display_name: "Donor Name",
+                            variable_name: "donor_name",
+                            value: name
+                        }
+                    ]
+                },
+
+                // -------------------------------
+                // Payment Completed
+                // -------------------------------
+                callback: function (response) {
+
+                    fetch("{% url 'verify_payment' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        },
+                        body: JSON.stringify({ reference: response.reference })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === "success") {
+                                showCenteredToast("Donation successful! Thank you 🙏", "rgba(25,135,84,0.95)");
+                                setTimeout(() => window.location.reload(), 1500);
+                            } else {
+                                showCenteredToast("Payment verification failed.", "rgba(220,53,69,0.92)");
+                            }
+                        })
+                        .catch(() => {
+                            showCenteredToast("A network error occurred.", "rgba(220,53,69,0.92)");
+                        });
+                },
+
+                // -------------------------------
+                // Payment Window Closed
+                // -------------------------------
+                onClose: function () {
+                    showCenteredToast("Payment was cancelled.");
+                }
+            });
+
+            handler.openIframe();
+        });
+    });
+</script>
+{% endblock %}

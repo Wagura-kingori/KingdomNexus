@@ -1,0 +1,17 @@
+{% extends 'church_base.html' %}
+{% block title %}Gallery — ACK Church{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom:30px; text-align: center;">Gallery</h1>
+<div style="display:flex; flex-wrap:wrap; gap:15px;">
+    {% for image in images %}
+    <div style="flex:1 1 300px; border:1px solid #ccc; border-radius:5px; overflow:hidden;">
+        <img src="{{ image.image.url }}" alt="{{ image.title }}" style="width:100%; height:auto;">
+        <div style="padding:10px;">
+            <h4>{{ image.title|default:'Untitled' }}</h4>
+            <p>{{ image.caption }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

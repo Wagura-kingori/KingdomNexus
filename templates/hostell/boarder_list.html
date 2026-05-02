@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+
+    <h2>Boarders (Students in Hostels)</h2>
+
+    <a href="{% url 'boarder_add' %}" class="btn btn-primary mb-3">+ Assign Student</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Student</th>
+                <th>Hostel</th>
+                <th>Room</th>
+                <th>Bed No.</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in boarders %}
+            <tr>
+                <td>{{ b.student }}</td>
+                <td>{{ b.room.hostel.name }}</td>
+                <td>{{ b.room.room_number }}</td>
+                <td>{{ b.bed_number }}</td>
+                <td>
+                    <a href="{% url 'boarder_edit' b.id %}" class="btn btn-sm btn-warning">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No boarders assigned</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

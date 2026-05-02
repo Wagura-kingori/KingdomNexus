@@ -1,0 +1,21 @@
+{% extends 'church_base.html' %}
+{% block content %}
+<h2 class="text-center">Sermons</h2>
+<div class="row">
+    {% for s in sermons %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>{{ s.title }}</h5>
+                <p>{{ s.preacher }} — {{ s.date }}</p>
+                {% if s.video_url %}
+                <div class="ratio ratio-16x9">
+                    <iframe src="{{ s.video_url }}" allowfullscreen></iframe>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

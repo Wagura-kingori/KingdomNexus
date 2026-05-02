@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: "DejaVu Sans", Arial, sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .details {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .details p {
+            margin: 2px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        .summary p {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h2>Payslip</h2>
+        <div>{{ payslip.employee.name }}</div>
+    </div>
+
+    <div class="details">
+        <p><strong>Period:</strong> {{ payslip.period.name }}</p>
+        <p><strong>Date:</strong> {{ payslip.period.end_date }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Amount</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in payslip.lines.all %}
+            <tr>
+                <td>{{ line.component.name if line.component else "Tax" }}</td>
+                <td>{{ line.amount|floatformat:2 }}</td>
+                <td>{{ "Deduction" if line.is_deduction else "Earning" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <p>Gross: {{ payslip.gross|floatformat:2 }}</p>
+        <p>Total Deductions: {{ payslip.total_deductions|floatformat:2 }}</p>
+        <p>Net Pay: {{ payslip.net_pay|floatformat:2 }}</p>
+    </div>
+
+</body>
+
+</html>

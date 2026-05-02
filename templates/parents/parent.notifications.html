@@ -1,0 +1,17 @@
+{% extends 'dashboard_base.html' %}
+{% block content %}
+<h2>Notifications</h2>
+
+<ul class="list-group">
+    {% for note in notices %}
+    <li class="list-group-item">
+        <strong>{{ note.title }}</strong><br>
+        <small>{{ note.date }}</small>
+        <p>{{ note.message }}</p>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-center">No notifications found.</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

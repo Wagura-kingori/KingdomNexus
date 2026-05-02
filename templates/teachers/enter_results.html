@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% block title %}Enter Results — {{ exam.name }}{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body, body.light-mode, body.dark-mode { background-color: #080f1c !important; color: #e2e8f0 !important; }
+main.container { padding-top: 0 !important; max-width: 100% !important; padding-left: 0 !important; padding-right: 0 !important; }
+
+.er-subnav {
+    background: rgba(10,20,38,.98); border-bottom: 1px solid rgba(56,189,248,.1);
+    backdrop-filter: blur(16px); display: flex; align-items: center;
+    height: 52px; padding: 0 1.6rem; gap: .8rem;
+    position: sticky; top: 60px; z-index: 900;
+}
+.er-back {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .76rem; font-weight: 600; color: #64748b;
+    text-decoration: none !important; padding: .32rem .75rem;
+    border-radius: 8px; border: 1px solid rgba(255,255,255,.07); transition: all .15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.er-back:hover { background: rgba(56,189,248,.08); color: #38bdf8; border-color: rgba(56,189,248,.2); }
+.er-back i { font-size: .7rem; }
+.er-nav-title { font-size: .7rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #38bdf8; flex: 1; }
+.er-breadcrumb { font-size: .73rem; color: #334155; display: flex; align-items: center; gap: .4rem; }
+.er-breadcrumb a { color: #475569; text-decoration: none; }
+.er-breadcrumb a:hover { color: #38bdf8; }
+.er-breadcrumb i { font-size: .55rem; }
+
+#er-page {
+    font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0;
+    padding: 2rem 1.8rem 5rem; max-width: 1000px; margin: 0 auto;
+    animation: erFadeUp .4s ease both;
+}
+@keyframes erFadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+#er-page .er-hero {
+    background: linear-gradient(135deg, #0c2035 0%, #0e2d4d 55%, #0b3a61 100%);
+    border-radius: 18px; padding: 2rem 2.4rem; margin-bottom: 2rem;
+    border: 1px solid rgba(56,189,248,.12); box-shadow: 0 20px 56px rgba(0,0,0,.5);
+    position: relative; overflow: hidden;
+}
+#er-page .er-hero::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,189,248,.08) 0%, transparent 70%);
+}
+#er-page .er-hero-inner { position: relative; z-index: 2; }
+#er-page .er-pg-label {
+    font-size: .68rem; font-weight: 700; letter-spacing: 2.8px;
+    text-transform: uppercase; color: #38bdf8; margin-bottom: .4rem;
+    display: flex; align-items: center; gap: .45rem;
+}
+#er-page .er-pg-label::before { content: ''; width: 16px; height: 2px; background: #38bdf8; border-radius: 2px; }
+#er-page .er-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; color: #f0f9ff; margin: 0 0 .6rem; line-height: 1.15; }
+#er-page .er-pill { display: inline-flex; align-items: center; gap: .4rem; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 30px; padding: .28rem .8rem; font-size: .76rem; font-weight: 500; color: #cbd5e1; }
+#er-page .er-pill i { color: #38bdf8; font-size: .7rem; }
+
+#er-page .er-alert {
+    border-radius: 12px; padding: .85rem 1.1rem; font-size: .83rem; font-weight: 500;
+    margin-bottom: 1rem; display: flex; align-items: flex-start; gap: .7rem; border: 1px solid;
+}
+#er-page .er-alert i { font-size: .85rem; flex-shrink: 0; margin-top: .1rem; }
+#er-page .er-alert-success { background: rgba(52,211,153,.08); border-color: rgba(52,211,153,.2); color: #6ee7b7; }
+#er-page .er-alert-error { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.2); color: #fca5a5; }
+
+#er-page .er-card {
+    background: #0d1b2e; border: 1px solid rgba(255,255,255,.07);
+    border-radius: 16px; overflow: hidden; margin-bottom: 1.4rem;
+}
+#er-page .er-card-head {
+    padding: .9rem 1.4rem; background: rgba(56,189,248,.04);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    display: flex; align-items: center; gap: .7rem;
+}
+#er-page .er-card-head .ch-icon {
+    width: 28px; height: 28px; background: rgba(56,189,248,.1);
+    border: 1px solid rgba(56,189,248,.2); border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; color: #38bdf8; flex-shrink: 0;
+}
+#er-page .er-card-head h6 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 700; color: #f1f5f9; margin: 0; }
+
+#er-page .er-table { width: 100%; border-collapse: collapse; }
+#er-page .er-table thead tr { background: rgba(56,189,248,.03); border-bottom: 1px solid rgba(56,189,248,.1); }
+#er-page .er-table thead th { padding: .8rem 1.2rem; text-align: left; font-size: .68rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #38bdf8; }
+#er-page .er-table tbody tr { border-bottom: 1px solid rgba(255,255,255,.04); transition: background .12s; }
+#er-page .er-table tbody tr:last-child { border-bottom: none; }
+#er-page .er-table tbody tr:hover { background: rgba(56,189,248,.03); }
+#er-page .er-table td { padding: .75rem 1.2rem; font-size: .83rem; color: #94a3b8; vertical-align: middle; }
+#er-page .td-name { font-weight: 600; color: #e2e8f0; }
+#er-page .td-adm { font-family: monospace; font-size: .76rem; color: #475569; }
+
+#er-page .er-current-score { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; }
+#er-page .score-high { color: #34d399; }
+#er-page .score-mid  { color: #fbbf24; }
+#er-page .score-low  { color: #f87171; }
+#er-page .score-none { font-family: 'Plus Jakarta Sans', sans-serif; font-size: .75rem; color: #334155; font-weight: 400; }
+
+#er-page .er-input {
+    width: 90px; background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.12); border-radius: 8px;
+    padding: .45rem .7rem; font-size: .86rem;
+    font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0;
+    outline: none; text-align: center;
+    transition: border-color .2s, box-shadow .2s;
+    -moz-appearance: textfield;
+}
+#er-page .er-input::-webkit-outer-spin-button,
+#er-page .er-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+#er-page .er-input:focus { border-color: rgba(56,189,248,.45); box-shadow: 0 0 0 3px rgba(56,189,248,.1); background: rgba(56,189,248,.04); }
+#er-page .er-input::placeholder { color: #334155; }
+#er-page .er-input.changed { border-color: rgba(251,191,36,.4); background: rgba(251,191,36,.04); }
+
+#er-page .er-grade-badge { display: inline-block; border-radius: 6px; padding: .15rem .55rem; font-size: .68rem; font-weight: 700; letter-spacing: .5px; }
+#er-page .grade-a { background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.25); color: #34d399; }
+#er-page .grade-b { background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; }
+#er-page .grade-c { background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; }
+#er-page .grade-d { background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; }
+
+#er-page .er-actions { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+#er-page .er-btn {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .82rem; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    border-radius: 10px; padding: .55rem 1.3rem; cursor: pointer;
+    border: 1px solid; transition: all .2s; text-decoration: none !important;
+}
+#er-page .er-btn-primary { background: linear-gradient(135deg, #0ea5e9, #38bdf8); border-color: transparent; color: #fff; box-shadow: 0 4px 14px rgba(14,165,233,.3); }
+#er-page .er-btn-primary:hover { background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff; box-shadow: 0 6px 22px rgba(14,165,233,.4); transform: translateY(-1px); }
+#er-page .er-btn-ghost { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); color: #64748b; }
+#er-page .er-btn-ghost:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); color: #e2e8f0; }
+#er-page .er-counter { font-size: .75rem; color: #334155; margin-left: auto; display: flex; align-items: center; gap: .35rem; }
+#er-page .er-counter i { color: #1e3a5f; }
+#er-page .er-counter span { color: #38bdf8; font-weight: 600; }
+
+#er-page .er-empty { padding: 2.5rem 1.4rem; text-align: center; }
+#er-page .er-empty i { font-size: 1.8rem; color: #1e3a5f; display: block; margin-bottom: .8rem; }
+#er-page .er-empty p { font-size: .83rem; color: #334155; }
+
+@media (max-width: 768px) {
+    .er-subnav { padding: 0 .9rem; }
+    .er-breadcrumb { display: none; }
+    #er-page { padding: 1.4rem 1rem 4rem; }
+    #er-page .er-title { font-size: 1.6rem; }
+    #er-page .er-input { width: 75px; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<nav class="er-subnav">
+    <a href="{% url 'teachers:subject_exams' subject.id %}" class="er-back"><i class="fas fa-arrow-left"></i> Back</a>
+    <div class="er-nav-title">Enter Results</div>
+    <div class="er-breadcrumb">
+        <a href="{% url 'teachers:dashboard' %}">Dashboard</a>
+        <i class="fas fa-chevron-right"></i>
+        <a href="{% url 'teachers:subject_exams' subject.id %}">{{ subject.name }}</a>
+        <i class="fas fa-chevron-right"></i>
+        <span style="color:#64748b;">{{ exam.name }}</span>
+    </div>
+</nav>
+
+<div id="er-page">
+
+    <div class="er-hero mb-4">
+        <div class="er-hero-inner">
+            <div class="er-pg-label">Enter / Edit Results</div>
+            <h1 class="er-title">{{ exam.name }}</h1>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="er-pill"><i class="fas fa-book-open"></i> {{ subject.name }}</span>
+                <span class="er-pill"><i class="fas fa-calendar"></i> {{ exam.term }} {{ exam.year }}</span>
+                {% if exam.exam_type %}<span class="er-pill"><i class="fas fa-tag"></i> {{ exam.exam_type }}</span>{% endif %}
+                <span class="er-pill"><i class="fas fa-users"></i> {{ rows|length }} students</span>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            {% if 'error' in message.tags %}
+                <div class="er-alert er-alert-error"><i class="fas fa-exclamation-circle"></i><div>{{ message }}</div></div>
+            {% else %}
+                <div class="er-alert er-alert-success"><i class="fas fa-check-circle"></i><div>{{ message }}</div></div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if rows %}
+    <form method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="er-card mb-4">
+            <div class="er-card-head">
+                <span class="ch-icon"><i class="fas fa-pen"></i></span>
+                <h6>Score Entry — {{ exam.name }}</h6>
+                <small style="margin-left:auto;font-size:.7rem;color:#334155;">
+                    Enter scores 0–100. Leave blank to skip.
+                </small>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="er-table" id="erTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student Name</th>
+                            <th>Adm No</th>
+                            <th>Current Score</th>
+                            <th>Grade</th>
+                            <th>New Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr>
+                            <td style="color:#334155;">{{ forloop.counter }}</td>
+                            <td class="td-name">{{ row.student.first_name }} {{ row.student.last_name }}</td>
+                            <td class="td-adm">{{ row.student.admission_no }}</td>
+                            <td>
+                                {% if row.result %}
+                                    <span class="er-current-score {% if row.result.score >= 70 %}score-high{% elif row.result.score >= 50 %}score-mid{% else %}score-low{% endif %}">
+                                        {{ row.result.score }}
+                                    </span>
+                                {% else %}
+                                    <span class="score-none">Not entered</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if row.result and row.result.grade %}
+                                    <span class="er-grade-badge {% if row.result.grade == 'A' %}grade-a{% elif row.result.grade == 'B' %}grade-b{% elif row.result.grade == 'C' %}grade-c{% else %}grade-d{% endif %}">
+                                        {{ row.result.grade }}
+                                    </span>
+                                {% else %}
+                                    <span style="color:#334155;font-size:.75rem;">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <input
+                                    type="number"
+                                    name="score_{{ row.student.id }}"
+                                    class="er-input"
+                                    min="0" max="100" step="0.5"
+                                    placeholder="{% if row.result %}{{ row.result.score }}{% else %}0–100{% endif %}"
+                                    autocomplete="off"
+                                >
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="er-actions">
+            <button type="submit" class="er-btn er-btn-primary" id="erSaveBtn">
+                <i class="fas fa-save"></i> Save Results
+            </button>
+            <a href="{% url 'teachers:subject_exams' subject.id %}" class="er-btn er-btn-ghost">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+            <div class="er-counter">
+                <i class="fas fa-pen"></i>
+                <span id="erChanged">0</span> scores entered
+            </div>
+        </div>
+
+    </form>
+
+    {% else %}
+    <div class="er-card">
+        <div class="er-empty">
+            <i class="fas fa-users"></i>
+            <p>No students are enrolled in {{ subject.name }} yet.<br>Enroll students in this subject to enter results.</p>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+(function () {
+    var inputs = document.querySelectorAll('.er-input');
+    var counter = document.getElementById('erChanged');
+    if (!inputs.length || !counter) return;
+
+    function updateCount() {
+        var count = 0;
+        inputs.forEach(function (inp) {
+            if (inp.value.trim() !== '') count++;
+        });
+        counter.textContent = count;
+    }
+
+    inputs.forEach(function (inp) {
+        inp.addEventListener('input', function () {
+            this.classList.toggle('changed', this.value.trim() !== '');
+            updateCount();
+        });
+    });
+
+    // Confirm before leaving with unsaved scores
+    var dirty = false;
+    inputs.forEach(function (inp) { inp.addEventListener('input', function () { dirty = true; }); });
+    document.querySelector('form').addEventListener('submit', function () { dirty = false; });
+    window.addEventListener('beforeunload', function (e) {
+        if (dirty) { e.preventDefault(); e.returnValue = ''; }
+    });
+})();
+</script>
+{% endblock %}

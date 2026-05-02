@@ -1,0 +1,51 @@
+
+{% extends "exams/exams_base.html" %}
+{% block exam_title %}All Exams{% endblock %}
+{% block nav_exams %}active{% endblock %}
+
+{% block exam_content %}
+<div class="exm-page-header">
+    <div class="exm-page-header-row">
+        <div>
+            <div class="exm-pg-label">Exam Management</div>
+            <h1 class="exm-page-title">All Exams</h1>
+            <div class="exm-page-sub">{{ exams.count }} exam{{ exams.count|pluralize }} in the system.</div>
+        </div>
+        <a href="{% url 'exams:exam_create' %}" class="exm-btn exm-btn-primary">
+            <i class="fas fa-plus"></i> Create Exam
+        </a>
+    </div>
+</div>
+
+<div class="exm-card">
+    <div class="exm-card-head">
+        <span class="exm-card-icon"><i class="fas fa-file-alt"></i></span>
+        <h6>Exams</h6>
+    </div>
+    {% if exams %}
+    <div style="overflow-x:auto;">
+    <table class="exm-table">
+        <thead><tr><th>#</th><th>Name</th><th>Type</th><th>Term</th><th>Year</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for exam in exams %}
+            <tr>
+                <td style="color:#334155;">{{ forloop.counter }}</td>
+                <td class="td-name">{{ exam.name }}</td>
+                <td>{% if exam.exam_type %}<span class="exm-badge badge-blue">{{ exam.exam_type }}</span>{% else %}<span style="color:#334155;">—</span>{% endif %}</td>
+                <td>{{ exam.term }}</td>
+                <td>{{ exam.year }}</td>
+                <td>{{ exam.date|default:"—" }}</td>
+                <td style="display:flex;gap:.4rem;flex-wrap:wrap;">
+                    <a href="{% url 'exams:exams_form' exam.id %}" class="exm-btn exm-btn-ghost exm-btn-sm"><i class="fas fa-pen"></i> Edit</a>
+                    <a href="{% url 'exams:class_ranking' exam.id %}" class="exm-btn exm-btn-ghost exm-btn-sm"><i class="fas fa-trophy"></i> Ranking</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="exm-empty"><i class="fas fa-file-alt"></i><p>No exams yet. Create one using the button above.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

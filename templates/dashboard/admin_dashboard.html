@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h2>Welcome, {{ request.user.username }}</h2>
+<p>This is your admin dashboard. From here you can manage students, teachers, attendance, fees, and more.</p>
+<div class="cards">
+    <div class="card">Students</div>
+    <div class="card">Teachers</div>
+    <div class="card">Attendance</div>
+    <div class="card">Fees</div>
+</div>
+{% endblock %}

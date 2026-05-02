@@ -1,0 +1,27 @@
+{% extends 'dashboard_base.html' %}
+{% block content %}
+<h2>{{ child.first_name }} {{ child.last_name }}</h2>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="card p-3">
+            <h4>Results</h4>
+            <a class="btn btn-primary mt-2" href="{% url 'parent_child_results' child.id %}">View</a>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card p-3">
+            <h4>Attendance</h4>
+            <a class="btn btn-success mt-2" href="{% url 'parent_child_attendance' child.id %}">View</a>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card p-3">
+            <h4>Fees</h4>
+            <a class="btn btn-warning mt-2" href="{% url 'parent_child_fees' child.id %}">View</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% load teacher_tags %}
+{% block title %}{{ subject.name }} — Exams & Results{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body, body.light-mode, body.dark-mode { background-color: #080f1c !important; color: #e2e8f0 !important; }
+main.container { padding-top: 0 !important; max-width: 100% !important; padding-left: 0 !important; padding-right: 0 !important; }
+
+.te-subnav {
+    background: rgba(10,20,38,.98); border-bottom: 1px solid rgba(56,189,248,.1);
+    backdrop-filter: blur(16px); display: flex; align-items: center;
+    height: 52px; padding: 0 1.6rem; gap: .8rem;
+    position: sticky; top: 60px; z-index: 900;
+}
+.te-back {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .76rem; font-weight: 600; color: #64748b;
+    text-decoration: none !important; padding: .32rem .75rem;
+    border-radius: 8px; border: 1px solid rgba(255,255,255,.07); transition: all .15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.te-back:hover { background: rgba(56,189,248,.08); color: #38bdf8; border-color: rgba(56,189,248,.2); }
+.te-back i { font-size: .7rem; }
+.te-nav-title { font-size: .7rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #38bdf8; flex: 1; }
+.te-breadcrumb { font-size: .73rem; color: #334155; display: flex; align-items: center; gap: .4rem; }
+.te-breadcrumb a { color: #475569; text-decoration: none; }
+.te-breadcrumb a:hover { color: #38bdf8; }
+.te-breadcrumb i { font-size: .55rem; }
+
+#te-page {
+    font-family: 'Plus Jakarta Sans', sans-serif; color: #e2e8f0;
+    padding: 2rem 1.8rem 5rem; max-width: 1200px; margin: 0 auto;
+    animation: teFadeUp .4s ease both;
+}
+@keyframes teFadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+#te-page .te-hero {
+    background: linear-gradient(135deg, #0c2035 0%, #0e2d4d 55%, #0b3a61 100%);
+    border-radius: 18px; padding: 2rem 2.4rem; margin-bottom: 2rem;
+    border: 1px solid rgba(56,189,248,.12); box-shadow: 0 20px 56px rgba(0,0,0,.5);
+    position: relative; overflow: hidden;
+}
+#te-page .te-hero::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,189,248,.08) 0%, transparent 70%);
+}
+#te-page .te-hero-inner { position: relative; z-index: 2; }
+#te-page .te-pg-label {
+    font-size: .68rem; font-weight: 700; letter-spacing: 2.8px;
+    text-transform: uppercase; color: #38bdf8; margin-bottom: .4rem;
+    display: flex; align-items: center; gap: .45rem;
+}
+#te-page .te-pg-label::before { content: ''; width: 16px; height: 2px; background: #38bdf8; border-radius: 2px; }
+#te-page .te-title { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 700; color: #f0f9ff; margin: 0 0 .6rem; line-height: 1.15; }
+#te-page .te-pill { display: inline-flex; align-items: center; gap: .4rem; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 30px; padding: .28rem .8rem; font-size: .76rem; font-weight: 500; color: #cbd5e1; }
+#te-page .te-pill i { color: #38bdf8; font-size: .7rem; }
+
+#te-page .te-section-head {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700;
+    color: #f1f5f9; margin-bottom: 1rem; display: flex; align-items: center; gap: .7rem;
+}
+#te-page .te-section-head .sh-icon {
+    width: 30px; height: 30px; background: rgba(56,189,248,.1);
+    border: 1px solid rgba(56,189,248,.2); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; color: #38bdf8; flex-shrink: 0;
+}
+#te-page .te-section-head::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(56,189,248,.2), transparent); margin-left: .5rem; }
+
+#te-page .te-exam-card {
+    background: #0d1b2e; border: 1px solid rgba(255,255,255,.07);
+    border-radius: 16px; overflow: hidden; margin-bottom: 1.2rem;
+    transition: border-color .2s, box-shadow .2s;
+}
+#te-page .te-exam-card:hover { border-color: rgba(56,189,248,.2); box-shadow: 0 8px 28px rgba(0,0,0,.4); }
+
+#te-page .te-exam-head {
+    padding: 1rem 1.4rem; background: rgba(56,189,248,.04);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .8rem;
+}
+#te-page .te-exam-name { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
+#te-page .te-exam-meta { font-size: .76rem; color: #475569; margin-top: .2rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+#te-page .te-exam-meta i { color: #38bdf8; font-size: .7rem; }
+
+#te-page .te-btn {
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-size: .76rem; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    border-radius: 8px; padding: .38rem .9rem; cursor: pointer;
+    border: 1px solid; transition: all .2s; text-decoration: none !important;
+}
+#te-page .te-btn-primary { background: linear-gradient(135deg, #0ea5e9, #38bdf8); border-color: transparent; color: #fff; box-shadow: 0 4px 12px rgba(14,165,233,.28); }
+#te-page .te-btn-primary:hover { background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff; transform: translateY(-1px); }
+#te-page .te-btn-ghost { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); color: #64748b; }
+#te-page .te-btn-ghost:hover { background: rgba(255,255,255,.09); color: #e2e8f0; border-color: rgba(255,255,255,.2); }
+
+#te-page .te-results-table { width: 100%; border-collapse: collapse; }
+#te-page .te-results-table th { padding: .65rem 1.1rem; text-align: left; font-size: .68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #475569; border-bottom: 1px solid rgba(255,255,255,.05); }
+#te-page .te-results-table td { padding: .65rem 1.1rem; font-size: .82rem; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,.04); }
+#te-page .te-results-table tbody tr:last-child td { border-bottom: none; }
+#te-page .te-results-table tbody tr:hover td { background: rgba(56,189,248,.03); }
+#te-page .td-name { font-weight: 600; color: #e2e8f0; }
+
+#te-page .te-score { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; }
+#te-page .score-high  { color: #34d399; }
+#te-page .score-mid   { color: #fbbf24; }
+#te-page .score-low   { color: #f87171; }
+#te-page .score-none  { color: #1e293b; font-size: .78rem; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 400; }
+
+#te-page .te-grade { display: inline-block; border-radius: 6px; padding: .15rem .55rem; font-size: .7rem; font-weight: 700; letter-spacing: .5px; }
+#te-page .grade-a { background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.25); color: #34d399; }
+#te-page .grade-b { background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.25); color: #60a5fa; }
+#te-page .grade-c { background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.25); color: #fbbf24; }
+#te-page .grade-d { background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.25); color: #f87171; }
+#te-page .grade-none { color: #334155; font-size: .75rem; }
+
+#te-page .te-empty-exam { padding: 1.5rem 1.4rem; font-size: .82rem; color: #334155; font-style: italic; }
+
+#te-page .te-no-exams {
+    background: #0d1b2e; border: 1px dashed rgba(56,189,248,.18);
+    border-radius: 16px; padding: 3.5rem 2rem; text-align: center;
+}
+#te-page .te-no-exams i { font-size: 2.2rem; color: #1e3a5f; display: block; margin-bottom: 1rem; }
+#te-page .te-no-exams h5 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: #94a3b8; margin-bottom: .4rem; }
+#te-page .te-no-exams p { font-size: .83rem; color: #334155; max-width: 300px; margin: 0 auto; }
+
+@media (max-width: 768px) {
+    .te-subnav { padding: 0 .9rem; }
+    .te-breadcrumb { display: none; }
+    #te-page { padding: 1.4rem 1rem 4rem; }
+    #te-page .te-title { font-size: 1.6rem; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<nav class="te-subnav">
+    <a href="{% url 'teachers:dashboard' %}" class="te-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+    <div class="te-nav-title">Exams &amp; Results</div>
+    <div class="te-breadcrumb">
+        <a href="{% url 'teachers:dashboard' %}">Dashboard</a>
+        <i class="fas fa-chevron-right"></i>
+        <span style="color:#64748b;">{{ subject.name }}</span>
+        <i class="fas fa-chevron-right"></i>
+        <span style="color:#64748b;">Exams &amp; Results</span>
+    </div>
+</nav>
+
+<div id="te-page">
+
+    <div class="te-hero mb-4">
+        <div class="te-hero-inner">
+            <div class="te-pg-label">Exams &amp; Results</div>
+            <h1 class="te-title">{{ subject.name }}</h1>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="te-pill"><i class="fas fa-school"></i> {{ school.name }}</span>
+                {% if subject.code %}<span class="te-pill"><i class="fas fa-hashtag"></i> {{ subject.code }}</span>{% endif %}
+                <span class="te-pill"><i class="fas fa-users"></i> {{ enrolled_students.count }} students</span>
+                <span class="te-pill"><i class="fas fa-file-alt"></i> {{ exams.count }} exams</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div class="te-section-head" style="margin-bottom:0;">
+            <span class="sh-icon"><i class="fas fa-file-alt"></i></span>
+            All Exams
+        </div>
+        <div class="d-flex gap-2">
+        <a href="{% url 'teachers:create_exam' subject.id %}" class="te-btn te-btn-primary">
+            <i class="fas fa-plus"></i> Create Exam
+        </a>
+        <a href="{% url 'teachers:subject_students' subject.id %}" class="te-btn te-btn-ghost">
+            <i class="fas fa-users"></i> View Students
+        </a>
+    </div>
+        <a href="{% url 'teachers:subject_students' subject.id %}" class="te-btn te-btn-ghost">
+            <i class="fas fa-users"></i> View Students
+        </a>
+    </div>
+
+    {% if exams %}
+        {% for exam in exams %}
+        <div class="te-exam-card">
+            <div class="te-exam-head">
+                <div>
+                    <div class="te-exam-name">{{ exam.name }}</div>
+                    <div class="te-exam-meta">
+                        <span><i class="fas fa-calendar"></i> {{ exam.term }} {{ exam.year }}</span>
+                        {% if exam.exam_type %}<span><i class="fas fa-tag"></i> {{ exam.exam_type }}</span>{% endif %}
+                        {% if exam.date %}<span><i class="fas fa-clock"></i> {{ exam.date }}</span>{% endif %}
+                    </div>
+                </div>
+                <a href="{% url 'teachers:enter_results' subject.id exam.id %}" class="te-btn te-btn-primary">
+                    <i class="fas fa-pen"></i> Enter / Edit Results
+                </a>
+            </div>
+
+            {% if enrolled_students %}
+            <div style="overflow-x:auto;">
+                <table class="te-results-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student</th>
+                            <th>Score</th>
+                            <th>Grade</th>
+                            <th>Remark</th>
+                            <th>Position</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in enrolled_students %}
+                        <tr>
+                            <td style="color:#334155;">{{ forloop.counter }}</td>
+                            <td class="td-name">{{ student.first_name }} {{ student.last_name }}</td>
+                            {% with result=results_map|get_item:exam.id %}
+                            {% with stu_result=result|get_item:student.id %}
+                            {% if stu_result %}
+                                <td>
+                                    <span class="te-score {% if stu_result.score >= 70 %}score-high{% elif stu_result.score >= 50 %}score-mid{% else %}score-low{% endif %}">
+                                        {{ stu_result.score }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if stu_result.grade %}
+                                    <span class="te-grade {% if stu_result.grade == 'A' %}grade-a{% elif stu_result.grade == 'B' %}grade-b{% elif stu_result.grade == 'C' %}grade-c{% else %}grade-d{% endif %}">
+                                        {{ stu_result.grade }}
+                                    </span>
+                                    {% else %}
+                                    <span class="grade-none">—</span>
+                                    {% endif %}
+                                </td>
+                                <td style="font-size:.78rem;color:#475569;">{{ stu_result.remark|default:"—" }}</td>
+                                <td style="font-size:.78rem;color:#475569;">{% if stu_result.position %}#{{ stu_result.position }}{% else %}—{% endif %}</td>
+                            {% else %}
+                                <td><span class="score-none">Not entered</span></td>
+                                <td><span class="grade-none">—</span></td>
+                                <td style="color:#334155;">—</td>
+                                <td style="color:#334155;">—</td>
+                            {% endif %}
+                            {% endwith %}
+                            {% endwith %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="te-empty-exam">No students enrolled in this subject yet.</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+    {% else %}
+    <div class="te-no-exams">
+        <i class="fas fa-file-alt"></i>
+        <h5>No Exams Created Yet</h5>
+        <p>No exams have been created in the system yet. Ask your administrator to create exams.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

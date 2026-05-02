@@ -1,0 +1,199 @@
+{% extends 'church_base.html' %}
+{% load static %}
+
+{% block title %}ACK Schools — ACK Church{% endblock %}
+
+{% block extra_head %}
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Swiper CSS for carousel previews -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+
+<style>
+    /* Page Title */
+    h1 {
+        text-align: center;
+        margin-bottom: 40px;
+        font-size: 2.5rem;
+        color: #ff7b59;
+    }
+
+    /* Schools Container */
+    .schools-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+        justify-content: center;
+    }
+
+    /* School Card */
+    .school-card {
+        flex: 1 1 300px;
+        background: linear-gradient(145deg, #fff8f2, #ffe5d0);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.4s ease;
+        position: relative;
+    }
+
+    /* Hover Effect */
+    .school-card:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(145deg, #ffd3b6, #ffb89c);
+    }
+
+    /* School Icon */
+    .school-icon {
+        font-size: 50px;
+        color: #ff7b59;
+        margin-bottom: 15px;
+        transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .school-card:hover .school-icon {
+        transform: scale(1.2);
+        color: #ff9a7b;
+    }
+
+    /* School Name */
+    .school-card h3 {
+        margin-bottom: 10px;
+        color: #1b1b1b;
+    }
+
+    /* School Details */
+    .school-card p {
+        margin: 5px 0;
+        font-weight: 500;
+        color: #333;
+    }
+
+    /* No Schools Message */
+    .no-schools {
+        text-align: center;
+        padding: 50px;
+        background: #fff3e6;
+        border-radius: 20px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Buttons */
+    .view-btn {
+        margin-top: 15px;
+        display: inline-block;
+        background-color: #ff7b59;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .view-btn:hover {
+        background-color: #ff9a7b;
+        transform: translateY(-2px);
+    }
+
+    /* Swiper Carousel in Cards */
+    .school-card .swiper {
+        width: 100%;
+        height: 180px;
+        margin-bottom: 15px;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .school-card .swiper-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+
+    .school-card .swiper-slide img:hover {
+        transform: scale(1.05);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2rem;
+        }
+
+        .school-card {
+            flex: 1 1 90%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>ACK Schools</h1>
+
+{% if schools %}
+<div class="schools-container">
+    {% for school in schools %}
+    <div class="school-card">
+        <i class="fas fa-school school-icon"></i>
+
+        <!-- Swiper Carousel Preview -->
+        {% if school.image1 or school.image2 or school.image3 %}
+        <div class="swiper schoolSwiper{{ forloop.counter }}">
+            <div class="swiper-wrapper">
+                {% if school.image1 %}
+                <div class="swiper-slide"><img src="{{ school.image1.url }}" alt="Image 1"></div>
+                {% endif %}
+                {% if school.image2 %}
+                <div class="swiper-slide"><img src="{{ school.image2.url }}" alt="Image 2"></div>
+                {% endif %}
+                {% if school.image3 %}
+                <div class="swiper-slide"><img src="{{ school.image3.url }}" alt="Image 3"></div>
+                {% endif %}
+            </div>
+            <!-- Navigation -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+        {% endif %}
+
+        <h3>{{ school.name }}</h3>
+        <p><strong>Address:</strong> {{ school.address }}</p>
+        <p><strong>Contact:</strong> {{ school.contact_phone }}</p>
+        <a href="{% url 'school_detail' school.pk %}" class="view-btn">View More Details</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-schools">
+    <h3>No schools are listed yet.</h3>
+    <p>Please check back later for updates about our schools.</p>
+</div>
+{% endif %}
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+<script>
+    {% for school in schools %}
+    var swiper{{ forloop.counter }} = new Swiper(".schoolSwiper{{ forloop.counter }}", {
+        slidesPerView: 1,
+        loop: true,
+        navigation: {
+            nextEl: ".schoolSwiper{{ forloop.counter }} .swiper-button-next",
+            prevEl: ".schoolSwiper{{ forloop.counter }} .swiper-button-prev",
+        },
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+        },
+    });
+    {% endfor %}
+</script>
+{% endblock %}

@@ -1,0 +1,18 @@
+# Dockerfile.weasyprint
+FROM python:3.10-slim
+
+# Install system deps needed by WeasyPrint
+RUN apt-get update && apt-get install -y \
+    libcairo2 libcairo2-dev \
+    libpango-1.0-0 libpangoft2-1.0-0 \
+    libgdk-pixbuf2.0-0 \
+    libffi-dev libglib2.0-0 \
+    fonts-dejavu-core \
+    wget curl \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install WeasyPrint Python package
+RUN pip install --no-cache-dir weasyprint
+
+WORKDIR /app
+ENTRYPOINT ["weasyprint"]

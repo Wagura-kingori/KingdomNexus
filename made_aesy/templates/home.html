@@ -1,0 +1,210 @@
+{% extends 'church_base.html' %}
+{% load static %}
+
+{% block title %}Home — ACK Church{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Announcements */
+    .announcement-bar {
+        background: #ffc107;
+        padding: 10px;
+        overflow: hidden;
+        white-space: nowrap;
+        color: #000;
+        font-weight: bold;
+        /* animation: slideText 12s linear infinite; */
+
+    }
+
+    /* @keyframes slideText {
+        0% {
+            transform: translateX(100%);
+        }
+
+        100% {
+            transform: translateX(-100%);
+        }
+    } */
+    .hero {
+        height: 200px;
+        background-size: cover;
+        background-position: center center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+        font-size: 2rem;
+        font-weight: bold;
+
+    }
+
+
+
+    /* Colorful theme accents */
+    .hero-cta {
+        background: linear-gradient(135deg, #ff7a59 0%, #ffcf66 100%);
+        color: #1b1b1b;
+        padding: 80px 20px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 8px 30px rgba(255, 122, 89, 0.15);
+    }
+
+    .hero-cta h1 {
+        font-size: 2.4rem;
+        font-weight: 700;
+    }
+
+    .quick-links .card {
+        border: 0;
+        border-radius: 12px;
+        transition: transform .15s ease;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.6);
+        background-color: #fff7f7;
+        height: 170px;
+    }
+
+    .quick-links .card:hover {
+        transform: translateY(-6px);
+    }
+
+    .event-card {
+        background: linear-gradient(180deg, #fff7f3 0, #fff0e6 100%);
+        border-radius: 12px;
+    }
+
+    .testimonial {
+        background: linear-gradient(90deg, #e8f8ff 0, #fff5f6 100%);
+        border-radius: 8px;
+        width: 26%;
+        padding: 5px;
+        margin: 5px;
+
+    }
+
+    .img-card {
+        height: 50px;
+        width: 50px;
+        border-radius: 12px;
+
+    }
+
+    .div-testimonial {
+        /* background-color: #adabab2f; */
+        border-radius: 12px;
+        margin: 20px auto;
+        padding: 20px;
+        display: flex;
+        justify-content: space-evenly;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Announcement Slider -->
+<div class="announcement-bar">
+    ✨ Sunday Service at 9:00 AM | ✝ Youth Fellowship on Saturday | 📢 Fundraising for Church Hall this month!
+</div>
+<div class="hero" style="background-image:url('/static/images/h.jpg');">
+    Welcome to ACK Church — Rooted in Christ
+</div>
+
+<div class="hero-cta mb-5">
+    <img src="{% static 'images/hero_waves.png' %}" alt="" style="height:60px; margin-bottom:10px;">
+    <h1>Welcome to ACK — Rooted in Faith, Growing in Love</h1>
+    <p class="lead mt-3">A warm, youth-friendly church serving our community through worship, learning, and service.</p>
+    <a href="/donate/" class="btn btn-lg btn-dark mt-3">Support Our Work</a>
+</div>
+
+<!-- Quick Links -->
+<div class="row quick-links g-3 mb-5">
+    <div class="col-md-3">
+        <a href="/sermons/" class="text-decoration-none text-dark">
+            <div class="card p-3 text-center">
+                <img src="{% static 'images/icon-sermon.png' %}" alt="" class="img-card">
+                <h5 class="mt-2">Sermons</h5>
+                <p class="small text-muted">Watch or listen to recent messages</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="/projects/" class="text-decoration-none text-dark">
+            <div class="card p-3 text-center">
+                <img src="{% static 'images/icon-projects.png' %}" alt="" class="img-card" class="img-card">
+                <h5 class="mt-2">Projects</h5>
+                <p class="small text-muted">Our community & school projects</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="/ministries/youth/" class="text-decoration-none text-dark">
+            <div class="card p-3 text-center">
+                <img src="{% static 'images/icon-youth.png' %}" alt="" class="img-card">
+                <h5 class="mt-2">Youth</h5>
+                <p class="small text-muted">Events, meetups and training</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="/contact/" class="text-decoration-none text-dark">
+            <div class="card p-3 text-center">
+                <img src="{% static 'images/icon-contact.png' %}" alt="" class="img-card">
+                <h5 class="mt-2">Get in touch</h5>
+                <p class="small text-muted">Prayers, enquiries & partnerships</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Upcoming events -->
+<h2 class="text-center">Upcoming Events</h2>
+<div class="row g-3 mb-5">
+    {% for e in events %}
+    <div class="col-md-4">
+        <div class="p-3 event-card">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h5 class="mb-1">{{ e.title }}</h5>
+                    <p class="small text-muted mb-1">{{ e.date }} · {{ e.time }} · {{ e.venue }}</p>
+                    <p class="mb-0">{{ e.short_description|truncatechars:120 }}</p>
+                </div>
+                <div class="text-end">
+                    <a href="{{ e.get_absolute_url }}" class="btn btn-sm btn-primary">Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <p class="text-center text-muted">No upcoming events — check back soon.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Featured projects (small) -->
+<h2 class="text-center">Featured Projects</h2>
+<div class="row g-3 mb-5">
+    {% for p in projects|slice:":4" %}
+    <div class="col-md-3">
+        <div class="card h-100">
+            {% if p.cover %}<img src="{{ p.cover.url }}" class="card-img-top">{% else %}<img
+                src="{% static 'images/project-placeholder.jpg' %}" class="card-img-top">{% endif %}
+            <div class="card-body">
+                <h6>{{ p.title }}</h6>
+                <p class="small text-muted">{{ p.short_description|truncatechars:80 }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Testimonials -->
+<h2 class="text-center">What People Say</h2>
+<div class="row g-3 mb-5 div-testimonial">
+    <div class="col-md-4 testimonial">“A place I can bring my friends. The youth group is awesome!” — Sarah</div>
+    <div class="col-md-4 testimonial">“The schools project changed our community.” — Mr. K.”</div>
+    <div class="col-md-4 testimonial">“Warm worship and clear teaching.” — Joseph</div>
+</div>
+{% endblock %}

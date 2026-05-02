@@ -1,0 +1,124 @@
+{% extends 'church_base.html' %}
+{% load static %}
+
+{% block title %}Men’s Fellowship — ACK Church{% endblock %}
+
+{% block extra_head %}
+<style>
+  .mini-hero {
+    background: linear-gradient(90deg, #c9e3ff, #e6f0ff);
+    padding: 40px;
+    border-radius: 14px;
+    color: #002b55;
+    text-align: center;
+  }
+
+  .ministry-card {
+    background: #f6faff;
+    border: 1px solid #d4e6ff;
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .leader-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #d7e9ff;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mini-hero mb-4">
+  <h2>KAMA — Kenya Anglican Men’s Association</h2>
+  <p class="lead">Building responsible Christian men grounded in faith, service and leadership.</p>
+</div>
+
+<!-- Mission -->
+<div class="ministry-card mb-4">
+  <h4>Our Mission</h4>
+  <p>
+    To empower men spiritually, socially and economically to become pillars of their families,
+    the Church and the community, according to the ACK KAMA mandate.
+  </p>
+</div>
+
+<!-- Core Activities -->
+<h4 class="mb-3">Programs & Activities</h4>
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="ministry-card">
+      <h6>⛪ Men’s Fellowship</h6>
+      <p>Weekly sessions for Bible study, discipleship and Christian mentorship.</p>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="ministry-card">
+      <h6>👨‍👩‍👧 Family Strengthening</h6>
+      <p>Training on fatherhood, marriage enrichment and family stewardship.</p>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="ministry-card">
+      <h6>🛠 Community Service</h6>
+      <p>Church maintenance, missions, charity work and community support programs.</p>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="ministry-card">
+      <h6>💼 Economic Empowerment</h6>
+      <p>Business forums, investment groups, skills development and savings programs.</p>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="ministry-card">
+      <h6>🎤 Men’s Choir</h6>
+      <p>Active participation in church worship through singing and liturgy support.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Leadership -->
+<h4 class="mt-5 mb-3">Leadership</h4>
+<div class="row g-4">
+
+  <div class="col-md-3 text-center">
+    <img src="{% static 'images/leader-placeholder.jpg' %}" class="leader-img">
+    <p class="mt-2 mb-0"><strong>Mr. Peter Kariuki</strong></p>
+    <p class="small text-muted">KAMA Chairman</p>
+  </div>
+
+  <div class="col-md-3 text-center">
+    <img src="{% static 'images/leader-placeholder.jpg' %}" class="leader-img">
+    <p class="mt-2 mb-0"><strong>Mr. John Mbugua</strong></p>
+    <p class="small text-muted">Vice Chairman</p>
+  </div>
+
+  <div class="col-md-3 text-center">
+    <img src="{% static 'images/leader-placeholder.jpg' %}" class="leader-img">
+    <p class="mt-2 mb-0"><strong>Rev. Samuel Kimani</strong></p>
+    <p class="small text-muted">Chaplain</p>
+  </div>
+
+</div>
+
+<!-- Scripture -->
+<div class="ministry-card mt-4">
+  <h5 class="mb-2">Scripture for Men</h5>
+  <p class="mb-1">“Be watchful, stand firm in the faith, act like men, be strong.”</p>
+  <p class="small text-muted">— 1 Corinthians 16:13</p>
+</div>
+
+<!-- Join -->
+<div class="text-center mt-4">
+  <a href="/contact/" class="btn btn-primary px-4 py-2">Join KAMA</a>
+</div>
+
+{% endblock %}

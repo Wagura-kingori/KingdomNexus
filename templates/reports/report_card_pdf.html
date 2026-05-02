@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: "DejaVu Sans", sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .school-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        h3 {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        p {
+            margin: 3px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #ddd;
+        }
+
+        .section {
+            margin-top: 15px;
+        }
+
+        .signatures {
+            margin-top: 40px;
+        }
+
+        .sign-line {
+            margin-top: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="school-name">{{ student.school.name }}</div>
+        <div>{{ student.school.address }}</div>
+        <h3>REPORT CARD</h3>
+    </div>
+
+    <p><strong>Name:</strong> {{ student.first_name }} {{ student.last_name }}</p>
+    <p><strong>Admission No:</strong> {{ student.admission_number|default:"N/A" }}</p>
+    <p><strong>Class:</strong> {{ student.current_class.name }} {{ student.current_section.name }}</p>
+    <p><strong>Exam:</strong> {{ exam.name }} {% if exam.exam_type %} ({{ exam.exam_type.name }}){% endif %}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Score</th>
+                <th>Grade</th>
+                <th>Remark</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in results %}
+            <tr>
+                <td>{{ r.subject.name }}</td>
+                <td>{{ r.score }}</td>
+                <td>{{ r.grade }}</td>
+                <td>{{ r.remark }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No results available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section">
+        <p><strong>Total Score:</strong> {{ total }}</p>
+        <p><strong>Average Score:</strong> {{ average }}</p>
+    </div>
+
+    <div class="signatures">
+        <p class="sign-line"><strong>Class Teacher Signature: ________________________</strong></p>
+        <p class="sign-line"><strong>Head Teacher Signature: _________________________</strong></p>
+    </div>
+
+</body>
+
+</html>

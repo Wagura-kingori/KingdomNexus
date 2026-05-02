@@ -1,0 +1,11 @@
+{% extends 'dashboard_base.html' %}
+{% block content %}
+<h2>My Profile</h2>
+
+<div class="card p-3">
+    <p><strong>Name:</strong> {{ parent.user.get_full_name }}</p>
+    <p><strong>Email:</strong> {{ parent.user.email }}</p>
+    <p><strong>Phone:</strong> {{ parent.phone }}</p>
+    <p><strong>Address:</strong> {{ parent.address }}</p>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}School Vehicles{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-3">School Vehicles</h3>
+
+    <a href="{% url 'transport:vehicle_create' %}" class="btn btn-primary mb-3">+ Add Vehicle</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Bus Name</th>
+                <th>Registration No.</th>
+                <th>Capacity</th>
+                <th>Driver</th>
+                <th>Route</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in vehicles %}
+            <tr>
+                <td>{{ v.name }}</td>
+                <td>{{ v.registration_no }}</td>
+                <td>{{ v.capacity }}</td>
+                <td>{{ v.driver }}</td>
+                <td>{{ v.route.name }}</td>
+                <td>
+                    <a href="{% url 'transport:vehicle_edit' v.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'transport:vehicle_delete' v.id %}" class="btn btn-sm btn-danger"
+                        onclick="return confirm('Delete this vehicle?')">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No vehicles added yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

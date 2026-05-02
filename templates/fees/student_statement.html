@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Fee Statement for {{ student.user.full_name }}</h2>
+
+<p><strong>Class:</strong> {{ student.current_class.name }}</p>
+
+<hr>
+
+<h4>Fee Structure</h4>
+<p><strong>Amount Required:</strong> KES {{ fee_structure.amount }}</p>
+
+<h4>Payments</h4>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Method</th>
+    </tr>
+
+    {% for p in payments %}
+    <tr>
+        <td>{{ p.date }}</td>
+        <td>KES {{ p.amount }}</td>
+        <td>{{ p.method }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h4>Summary</h4>
+<p><strong>Total Paid:</strong> KES {{ total_paid }}</p>
+<p><strong>Balance:</strong> <span class="{% if balance > 0 %}text-danger{% else %}text-success{% endif %}">
+        KES {{ balance }}
+    </span></p>
+
+{% endblock %}
