@@ -45,14 +45,14 @@ A comprehensive multi-tenant school management system built with Django, featuri
 
 3. **Configure environment variables** — copy and edit `.env`:
    ```env
-   SECRET_KEY=your-secret-key
-   DEBUG=True
+   SECRET_KEY=generate-your-new-secret-key
+   DEBUG=False 
    ALLOWED_HOSTS=localhost,127.0.0.1
 
    # Database
-   DB_NAME=kingdomnexus
+   DB_NAME=kingdomnexus(just a placeholder)
    DB_USER=postgres
-   DB_PASSWORD=yourpassword
+   DB_PASSWORD=password
    DB_HOST=localhost
    DB_PORT=5432
 
@@ -92,7 +92,7 @@ A comprehensive multi-tenant school management system built with Django, featuri
 ---
 
 ## 🧩 Apps Overview
-
+## some apps are still in development 
 | App | Purpose |
 |---|---|
 | `users` | Custom user model, role management, middleware, force-password-change flow |
