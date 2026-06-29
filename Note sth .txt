@@ -1,3 +1,0 @@
->Currently all statitc files(javascript,images and css) are in their respective html documents, this is Just for faster accessibility
-I will add them later to static folder then and collect them in productions files. for easy updates.
->some files are duplicate..it seems I will have to build a module each at time to avoid this

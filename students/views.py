@@ -1,20 +1,46 @@
 from rest_framework import viewsets
-from .models import Student, ClassGrade, Section
+
 from profiles.models import ParentProfile
-from .serializers import StudentSerializer, ClassGradeSerializer, SectionSerializer, ParentProfileSerializer
+from .serializers import (
+    StudentSerializer,
+    ClassGradeSerializer,
+    SectionSerializer,
+    ParentProfileSerializer
+)
+
 from rest_framework.permissions import IsAuthenticated
+
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import StudentForm
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+
 import json
 
 from schools.models import School
-from .models import ClassGrade, Section
 
+# STUDENT MODELS
+from .models import (
+    ClassGrade,
+    Section,
+    Student,
+)
 
+# TIMETABLE MODELS
+from timetable.models import (
+    TimetableSetting,
+    SubjectConfiguration,
+    TimetableEntry,
+    TimetableBreak,
+)
+    
+
+from rest_framework.permissions import AllowAny
+from .models import Classroom
+from rest_framework import serializers
 
 
 def _school_access(request, school):
@@ -223,3 +249,18 @@ def edit_student(request, student_id):
     else:
         form = StudentForm(instance=student)
     return render(request, 'students/edit_student.html', {'form': form, 'student': student})
+
+
+
+class ClassroomSerializer(serializers.ModelSerializer):
+    class_grade_name = serializers.CharField(source='class_grade.name', read_only=True)
+    section_name = serializers.CharField(source='section.name', read_only=True)
+
+    class Meta:
+        model = Classroom
+        fields = ['id', 'class_grade', 'class_grade_name', 'section', 'section_name', 'class_teacher']
+
+class ClassroomViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Classroom.objects.all().select_related('class_grade', 'section')
+    serializer_class = ClassroomSerializer
+    permission_classes = [AllowAny]

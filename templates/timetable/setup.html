@@ -1,40 +1,486 @@
-{% load timetable_tags %}
-<h2>{{ classroom }} Timetable Setup</h2>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timetable Setup — {{ classroom }}</title>
 
-<form method="post">
-    {% csrf_token %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>Subject</th>
-            <th>Teacher</th>
-            <th>Lessons / Week</th>
-        </tr>
+  <link rel="stylesheet" href="{% static 'timetable/css/setup.css' %}">
+</head>
 
-        {% for a in assignments %}
-        <tr>
-            <td>{{ a.subject.name }}</td>
-            <td>{{ a.teacher.user.get_full_name }}</td>
-            <td>
-                <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    name="subject_{{ a.subject.id }}"
-                    value="{{ existing|get_item:a.subject.id|default:4 }}"
-                >
-            </td>
-        </tr>
+<body {% if messages %}{% for message in messages %}{% if message.tags == 'success' %}data-saved="true"{% endif %}{% endfor %}{% endif %}>
+
+<!-- ═══════════════ SHELL ═══════════════ -->
+<div class="shell">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="sidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-row">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        </div>
+        <span class="brand-name">TimetableSetup</span>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Scheduling</div>
+
+      <a href="#" class="nav-item active">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Timetable Setup
+      </a>
+
+      <a href="{% url 'timetable:generate_timetable' classroom.id %}" class="nav-item">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
+        Timetable Overview
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Management</div>
+
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Subjects &amp; Rooms
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Teachers
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Classes
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">System</div>
+
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Notifications
+        <span style="margin-left:auto;background:var(--blue);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px">3</span>
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Settings
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <div class="u-name">Admin User</div>
+          <div class="u-email">admin@school.edu</div>
+        </div>
+        <svg class="logout-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <main class="main-content">
+
+    <!-- Topbar (only shown on some pages, we hide per the screenshots) -->
+
+    <!-- ── Scrollable Content ── -->
+    <div class="content-area">
+
+      <!-- Page header (matches screenshot style) -->
+      <div class="page-header-block">
+        <div class="page-header-left">
+          <div class="page-header-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <div>
+            <div class="page-h1">
+              {{ classroom }}
+              <span class="badge badge-draft" id="save-badge">Draft</span>
+            </div>
+            <div class="page-h1-sub">Timetable Setup · Academic Year {{ form.academic_year.value|default:"2025–2026" }}</div>
+          </div>
+        </div>
+
+        <div class="page-header-chips">
+          <div class="chip">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="chip-lessons">— lessons/week</span>
+          </div>
+          <div class="chip warn" id="chip-unassigned" style="display:none">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>0 unassigned</span>
+          </div>
+          <div class="chip" style="background:var(--red-lt);color:var(--red);border-color:#fca5a5;display:none" id="chip-conflicts">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span>0 conflicts</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Django messages -->
+      {% if messages %}
+      <div class="messages-wrap">
+        {% for message in messages %}
+        <div class="message-box {{ message.tags }}">{{ message }}</div>
         {% endfor %}
-    </table>
+      </div>
+      {% endif %}
 
-    <br>
+      <!-- Conflict banner (JS-controlled) -->
+      <div id="conflict-banner" class="conflict-banner" style="display:none">
+        <div class="cb-icon">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="cb-title" id="cb-title">Scheduling conflicts detected</div>
+          <div class="cb-list" id="cb-list"></div>
+          <div class="cb-note">Resolve all conflicts before generating the timetable.</div>
+        </div>
+      </div>
 
-    <button type="submit">Save Setup</button>
-</form>
+      <!-- ══════════ FORM ══════════ -->
+      <form method="post" id="timetable-form">
+        {% csrf_token %}
 
-<br>
+        <!-- ── General Settings ── -->
+        <section class="glass-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon blue">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+              </div>
+              <div>
+                <div class="card-title">General Settings</div>
+                <div class="card-subtitle">Core configuration for this classroom timetable</div>
+              </div>
+            </div>
+            <div class="card-header-right">
+              <span style="font-size:12px;color:var(--text-3)">Core configuration for this classroom timetable</span>
+            </div>
+          </div>
 
-<a href="{% url 'timetable:generate' classroom.id %}">
-    Generate Timetable
-</a>
+          <div class="card-body">
+            <div class="form-grid">
+              {{ form.as_p }}
+            </div>
+            <p class="form-note">Fields marked <span>*</span> are required before generating a timetable.</p>
+          </div>
+        </section>
+
+        <!-- ── Break Configuration ── -->
+        <section class="glass-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon amber">
+                <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+              </div>
+              <div>
+                <div class="card-title">Break Configuration</div>
+                <div class="card-subtitle">Configure all break intervals</div>
+              </div>
+            </div>
+            <div class="card-header-right">
+              <span class="card-count" id="break-count">
+                {{ break_formset.total_form_count }} break{{ break_formset.total_form_count|pluralize }} configured
+              </span>
+              <button type="button" class="btn btn-primary btn-sm add-break-btn" id="add-break-row">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Break
+              </button>
+            </div>
+          </div>
+
+          {{ break_formset.management_form }}
+
+          <!-- Empty state -->
+          <div id="break-empty" class="empty-state" {% if break_formset.total_form_count > 0 %}style="display:none"{% endif %}>
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
+            </div>
+            <div class="empty-title">No breaks configured yet</div>
+            <div class="empty-sub">Add break periods to separate teaching blocks in the daily schedule.</div>
+            <button type="button" class="btn btn-primary btn-sm add-break-btn" id="add-break-row-empty" style="margin-top:12px">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add First Break
+            </button>
+          </div>
+
+          <!-- Table -->
+          <div id="break-table-wrap" {% if break_formset.total_form_count == 0 %}style="display:none"{% endif %}>
+            <div class="table-wrapper">
+              <table class="modern-table" id="break-table">
+                <thead>
+                  <tr>
+                    <th style="width:32px"></th>
+                    <th>Break Name</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Duration</th>
+                    <th class="center" style="width:60px">Remove</th>
+                  </tr>
+                </thead>
+                <tbody id="break-tbody">
+                  {% for bform in break_formset %}
+                  <tr class="break-row">
+                    <td class="drag-handle" title="Drag to reorder">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="9"  cy="7"  r="1.2" fill="currentColor"/>
+                        <circle cx="15" cy="7"  r="1.2" fill="currentColor"/>
+                        <circle cx="9"  cy="12" r="1.2" fill="currentColor"/>
+                        <circle cx="15" cy="12" r="1.2" fill="currentColor"/>
+                        <circle cx="9"  cy="17" r="1.2" fill="currentColor"/>
+                        <circle cx="15" cy="17" r="1.2" fill="currentColor"/>
+                      </svg>
+                    </td>
+                    <td>{{ bform.name }}</td>
+                    <td>{{ bform.start_time }}</td>
+                    <td>{{ bform.end_time }}</td>
+                    <td class="duration-cell">
+                      <span class="duration-badge"
+                            data-start="{{ bform.start_time.value }}"
+                            data-end="{{ bform.end_time.value }}">—</span>
+                    </td>
+                    <td class="center-cell">
+                      {{ bform.DELETE }}
+                      <button type="button" class="btn-icon del-break-btn" title="Remove break">
+                        <svg viewBox="0 0 24 24">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                          <path d="M10 11v6"/><path d="M14 11v6"/>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Table footer -->
+          <div class="table-footer" id="break-table-footer" {% if break_formset.total_form_count == 0 %}style="display:none"{% endif %}>
+            <button type="button" class="btn btn-dashed add-break-btn" id="add-break-row-footer">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Break
+            </button>
+          </div>
+        </section>
+
+        <!-- ── Subject Configuration ── -->
+        <section class="glass-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <div class="card-icon blue">
+                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              </div>
+              <div>
+                <div class="card-title">Subject Configuration</div>
+                <div class="card-subtitle">Assign teachers and configure lesson frequency</div>
+              </div>
+            </div>
+            <div class="card-header-right">
+              <span class="card-count" id="header-subj-count">
+                {{ subject_formset.total_form_count }} subject{{ subject_formset.total_form_count|pluralize }} · — lessons/week
+              </span>
+              <button type="button" class="btn btn-primary btn-sm add-subject-btn" id="add-subject-row">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Subject
+              </button>
+            </div>
+          </div>
+
+          {{ subject_formset.management_form }}
+
+          <!-- Empty state -->
+          <div id="subject-empty" class="empty-state" {% if subject_formset.total_form_count > 0 %}style="display:none"{% endif %}>
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <div class="empty-title">No subjects added yet</div>
+            <div class="empty-sub">Add subjects to define the curriculum taught in this classroom.</div>
+            <button type="button" class="btn btn-primary btn-sm add-subject-btn" id="add-subject-row-empty" style="margin-top:12px">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add First Subject
+            </button>
+          </div>
+
+          <!-- Table -->
+          <div id="subject-table-wrap" {% if subject_formset.total_form_count == 0 %}style="display:none"{% endif %}>
+            <div class="table-wrapper">
+              <table class="modern-table" id="subject-table" style="min-width:1020px">
+                <thead>
+                  <tr>
+                    <th style="width:32px"></th>
+                    <th style="min-width:160px">Subject</th>
+                    <th style="min-width:180px">Assigned Teacher</th>
+                    <th style="width:130px">
+                      Lessons&nbsp;/&nbsp;Week
+                    </th>
+                    <th class="center" style="width:100px">Fixed&nbsp;Slot</th>
+                    <th style="width:130px">Fixed&nbsp;Day</th>
+                    <th style="width:130px">Fixed&nbsp;Start</th>
+                    <th class="center" style="width:60px">Remove</th>
+                  </tr>
+                </thead>
+                <tbody id="subject-tbody">
+                  {% for sform in subject_formset %}
+                  <tr class="subject-row">
+                    <td class="drag-handle" title="Drag to reorder">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="9"  cy="7"  r="1.2" fill="currentColor"/>
+                        <circle cx="15" cy="7"  r="1.2" fill="currentColor"/>
+                        <circle cx="9"  cy="12" r="1.2" fill="currentColor"/>
+                        <circle cx="15" cy="12" r="1.2" fill="currentColor"/>
+                        <circle cx="9"  cy="17" r="1.2" fill="currentColor"/>
+                        <circle cx="15" cy="17" r="1.2" fill="currentColor"/>
+                      </svg>
+                    </td>
+
+                    <!-- Subject select -->
+                    <td>{{ sform.subject }}</td>
+
+                    <!-- Teacher select -->
+                    <td>
+                      {{ sform.teacher_assignment }}
+                      {% if sform.subject.value and not sform.teacher_assignment.value %}
+                      <span class="teacher-warn">Teacher required</span>
+                      {% endif %}
+                    </td>
+
+                    <!-- Lessons / week +/- control -->
+                    <td>
+                      <div class="lpw">
+                        <button type="button" class="lpw-btn dec" tabindex="-1">−</button>
+                        <input type="hidden"
+                               name="{{ sform.lessons_per_week.html_name }}"
+                               value="{{ sform.lessons_per_week.value|default:2 }}"
+                               class="lpw-hidden">
+                        <span class="lpw-val">{{ sform.lessons_per_week.value|default:2 }}</span>
+                        <button type="button" class="lpw-btn inc" tabindex="-1">+</button>
+                      </div>
+                    </td>
+
+                    <!-- Fixed toggle -->
+                    <td>
+                      <div class="toggle-cell">
+                        <svg class="lock-icon {% if sform.is_fixed.value %}locked{% else %}unlocked{% endif %}"
+                             viewBox="0 0 24 24" fill="none" stroke-width="2" stroke="currentColor">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        <label class="toggle">
+                          <input type="checkbox"
+                                 name="{{ sform.is_fixed.html_name }}"
+                                 id="{{ sform.is_fixed.id_for_label }}"
+                                 class="is-fixed-chk"
+                                 {% if sform.is_fixed.value %}checked{% endif %}>
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </td>
+
+                    <!-- Fixed day -->
+                    <td>{{ sform.fixed_day }}</td>
+
+                    <!-- Fixed start time -->
+                    <td>{{ sform.fixed_start_time }}</td>
+
+                    <!-- Delete -->
+                    <td class="center-cell">
+                      {{ sform.DELETE }}
+                      <button type="button" class="btn-icon del-subject-btn" title="Remove subject">
+                        <svg viewBox="0 0 24 24">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                          <path d="M10 11v6"/><path d="M14 11v6"/>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+
+                <!-- Table foot totals row -->
+                <tfoot>
+                  <tr>
+                    <td colspan="3" style="font-size:12px;color:var(--text-3);font-weight:600">
+                      Total across <span id="tfoot-subj-count">{{ subject_formset.total_form_count }}</span> subjects
+                    </td>
+                    <td>
+                      <span class="tfoot-total" id="tfoot-lessons">—</span>
+                      <span style="font-size:11px;color:var(--text-3);margin-left:4px">lessons/week</span>
+                    </td>
+                    <td colspan="4">
+                      <span style="font-size:12px;color:var(--text-3)">
+                        <span id="tfoot-fixed">0</span>
+                        fixed slot<span id="tfoot-fixed-pl">s</span>
+                      </span>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Table footer -->
+          <div class="table-footer" id="subject-table-footer" {% if subject_formset.total_form_count == 0 %}style="display:none"{% endif %}>
+            <button type="button" class="btn btn-dashed add-subject-btn" id="add-subject-row-footer">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Subject
+            </button>
+          </div>
+        </section>
+
+      </form>
+
+    </div><!-- /content-area -->
+  </main>
+
+</div><!-- /shell -->
+
+<!-- ══════════ FLOATING SAVE BAR ══════════ -->
+<div class="floating-save-bar">
+  <div>
+    <!-- Left: conflict hint or empty -->
+    <div class="conflict-hint" id="save-conflict-hint" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Resolve conflicts before generating
+    </div>
+  </div>
+
+  <div class="save-bar-actions">
+    <a href="{% url 'timetable:generate_timetable' classroom.id %}" class="btn btn-outline">
+      <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Preview Overview
+    </a>
+
+    <button type="submit" form="timetable-form" class="btn btn-outline">
+      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save Setup
+    </button>
+
+    <a href="{% url 'timetable:generate_timetable' classroom.id %}" class="btn btn-primary" id="generate-btn">
+      <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Generate Timetable
+    </a>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script src="{% static 'timetable/js/setup.js' %}"></script>
+</body>
+</html>

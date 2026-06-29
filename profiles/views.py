@@ -3,7 +3,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import TeacherProfile, ParentProfile, PayrollProfile
 from .forms import TeacherProfileForm, ParentProfileForm, PayrollProfileForm
-
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
+from .serializers import TeacherProfileSerializer
 
 @login_required
 def profile_view(request):
@@ -92,3 +94,10 @@ def payroll_profile(request):
         "form": form,
         "profile": profile,
     })
+
+
+
+class TeacherProfileViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = TeacherProfile.objects.all()
+    serializer_class = TeacherProfileSerializer
+    permission_classes = [AllowAny]

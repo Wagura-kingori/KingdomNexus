@@ -6,10 +6,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import SubjectForm, EnrollmentForm
 from django.contrib import messages
 from schools.models import School
+from rest_framework import generics
+from .serializers import SubjectSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny
 class SubjectViewSet(viewsets.ModelViewSet):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 class EnrollmentViewSet(viewsets.ModelViewSet):
     queryset = Enrollment.objects.all()
@@ -112,3 +115,10 @@ def enrollment_edit(request, pk):
     else:
         form = EnrollmentForm(instance=enrollment)
     return render(request, 'academics/enrollments_form.html', {'form': form})
+
+
+class SubjectListAPIView(generics.ListAPIView):
+    queryset = Subject.objects.all()
+    serializer_class = SubjectSerializer
+    permission_classes = [AllowAny]
+    

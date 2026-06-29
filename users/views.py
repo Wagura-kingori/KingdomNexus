@@ -19,6 +19,11 @@ from .models import User
 from .serializers import UserSerializer
 from .forms import AddUserForm, AddStudentForm, SchoolAdminForm
 from .decorators import role_required, super_admin_required
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
+
 
 
 # -----------------------------
@@ -339,7 +344,7 @@ class RoleBasedLoginView(LoginView):
 
     def _role_url(self, user):
         if user.must_change_password:
-            return reverse("force_password_change")
+            return reverse("users:force_password_change")
         if user.role == "superadmin":
             return "/dashboard/super/"
         if not user.school:
@@ -386,28 +391,10 @@ def payroll_manager_dashboard(request):
 # FORCE PASSWORD CHANGE
 # -----------------------------
 @login_required
+@login_required
 def force_password_change(request):
     if not request.user.must_change_password:
         return redirect("home")
-
-    # For teacher role — pass all classrooms so the class-teacher modal can show them
-    if role == "teacher":
-        classrooms_qs = Classroom.objects.filter(
-            class_grade__school=school
-        ).select_related("class_grade", "section").order_by(
-            "class_grade__name", "section__name"
-        )
-        classrooms_json = json.dumps([
-            {
-                "id":         c.id,
-                "grade":      c.class_grade.name,
-                "section":    c.section.name if c.section else "",
-                "label":      f"{c.class_grade.name} — {c.section.name}" if c.section else c.class_grade.name,
-                "teacher_id": c.class_teacher_id,
-            }
-            for c in classrooms_qs
-        ])
-        extra_ctx["classrooms_json"] = classrooms_json
 
     if request.method == "POST":
         form = PasswordChangeForm(request.user, request.POST)
@@ -422,3 +409,45 @@ def force_password_change(request):
         form = PasswordChangeForm(request.user)
 
     return render(request, "users/force_password_change.html", {"form": form})
+
+
+
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication])
+@permission_classes([AllowAny])
+def current_user_api(request):
+    if not request.user.is_authenticated:
+        return Response({'authenticated': False})
+
+    user = request.user
+    data = {
+        'authenticated': True,
+        'id': user.id,
+        'name': user.get_full_name() or user.username,
+        'role': user.role,
+        'is_admin': user.role in ('admin', 'superadmin') or user.is_superuser,
+        'is_superadmin': user.role == 'superadmin' or user.is_superuser,
+        'school': None,
+        'classroom': None,
+    }
+
+    if user.school:
+        data['school'] = {
+            'id': user.school.id,
+            'name': user.school.name,
+        }
+
+    classroom = Classroom.objects.filter(
+        class_teacher=user
+    ).select_related('class_grade', 'section').first()
+
+    if classroom:
+        data['classroom'] = {
+            'id': classroom.id,
+            'name': str(classroom),
+            'class_grade': classroom.class_grade.name,
+            'section': classroom.section.name,
+        }
+
+    return Response(data)

@@ -2,10 +2,12 @@ from django.urls import path
 from . import views
 from .views import RoleBasedLoginView
 
+from .views import current_user_api
 
 
 app_name = "users"
 urlpatterns = [
+    path('api/me/', current_user_api, name='current-user'),
     # path('login/', views.login_view, name='login'),
     path("login/", RoleBasedLoginView.as_view(), name="login"),
     path("admin_dashboard/", views.admin_dashboard, name="admin_dashboard"),

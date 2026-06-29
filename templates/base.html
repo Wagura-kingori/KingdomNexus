@@ -360,7 +360,7 @@
             <ul class="submenu">
                 <li><a href="{% if user.school %}{% url 'academics:manage_subjects' user.school.id %}{% else %}{% url 'academics:subjects_list' %}{% endif %}"><i class="bi bi-journals me-2"></i>Subjects</a></li>
                 <li><a href="{% url 'academics:enrollments_list' %}"><i class="bi bi-person-check me-2"></i>Enrollments</a></li>
-                <li><a href="{% url 'timetable:timetable_list' %}"><i class="bi bi-calendar3 me-2"></i>Timetable</a></li>
+             
             </ul>
         </li>
 

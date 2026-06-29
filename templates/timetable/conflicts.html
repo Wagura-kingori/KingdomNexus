@@ -1,0 +1,13 @@
+<h2>Conflict Dashboard - {{ classroom }}</h2>
+
+{% if conflicts %}
+    <ul>
+        {% for c in conflicts %}
+            <li style="color:red;">
+                {{ c.teacher }} - {{ c.day }} at {{ c.time }} → {{ c.issue }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p style="color:green;">No conflicts detected 🎉</p>
+{% endif %}

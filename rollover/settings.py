@@ -33,9 +33,17 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     ),
 }
+#celery
+CELERY_BROKER_URL = "redis://localhost:6379/0"
 
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
+CELERY_RESULT_SERIALIZER = "json"
 # APPLICATIONS
 INSTALLED_APPS = [
+    'rest_framework',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,8 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third-party
-    'rest_framework',
+    
 
     # Your apps
     'made_aesy',
@@ -81,6 +88,7 @@ LOGOUT_REDIRECT_URL = "/"
 
 # MIDDLEWARE
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -91,6 +99,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'users.middleware.ForcePasswordChangeMiddleware',
 ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4028",
+    
+]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:4028",
+]
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'rollover.urls'
 

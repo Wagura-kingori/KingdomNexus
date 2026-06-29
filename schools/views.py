@@ -4,6 +4,10 @@ from users.decorators import super_admin_required
 from .models import School
 from .forms import SchoolForm
 from django.shortcuts import render, get_object_or_404
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
+from rest_framework import serializers
+
 
 
 
@@ -43,3 +47,13 @@ def add_school(request):
     return render(request, "schools/add_school.html", {
         "form": form
     })
+
+class SchoolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = School
+        fields = ['id', 'name']
+
+class SchoolViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = School.objects.all()
+    serializer_class = SchoolSerializer
+    permission_classes = [AllowAny]

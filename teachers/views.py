@@ -11,6 +11,11 @@ from exams.forms import ExamForm
 from teachers.models import TeacherSubjectAssignment
 from payroll.decorators import teacher_required
 
+from rest_framework import viewsets
+from .models import Teacher
+from .serializers import TeacherSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 
 # ─────────────────────────────────────────────────
 #  HELPERS
@@ -348,3 +353,14 @@ def teacher_create_exam(request, assignment_id):
         "classroom":  assignment.classroom,
         "form":       form,
     })
+
+
+from rest_framework import viewsets
+from .models import Teacher
+from .serializers import TeacherSerializer
+
+
+class TeacherViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Teacher.objects.all()
+    serializer_class = TeacherSerializer
+    permission_classes = [AllowAny]

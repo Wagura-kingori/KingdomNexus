@@ -1,199 +1,247 @@
-from datetime import datetime, timedelta, date, time
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-
+from rest_framework import viewsets, generics
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
 from students.models import Classroom
-from profiles.models import TeacherProfile
-from teachers.models import TeacherSubjectAssignment
-
 from .models import (
-    TimetableSetting,
-    TimetableEntry,
-    SubjectRule,
+    Room,
+    MasterTimetableEntry,
+    ClassroomTimetable,
+    ClassroomTimetableEntry,
+    Period,
+    TimetableGenerationConfig,
+    GenerationBreak,
+    ClassroomSubjectConfig,
+    TimetableGenerationJob,
+)
+from .serializers import (
+    RoomSerializer,
+    MasterTimetableEntrySerializer,
+    ClassroomTimetableSerializer,
+    ClassroomTimetableEntrySerializer,
+    PeriodSerializer,
+    TimetableGenerationConfigSerializer,
+    GenerationBreakSerializer,
+    ClassroomSubjectConfigSerializer,
+    TimetableGenerationJobSerializer,
 )
 
-from .decorators import can_manage_timetable
+
+class RoomViewSet(viewsets.ModelViewSet):
+    queryset = Room.objects.all()
+    serializer_class = RoomSerializer
+    permission_classes = [AllowAny]
 
 
-# ------------------------------------------------
-# Setup Timetable
-# ------------------------------------------------
-@login_required
-def setup_timetable(request, classroom_id):
-    classroom = get_object_or_404(Classroom, pk=classroom_id)
+class MasterTimetableEntryViewSet(viewsets.ModelViewSet):
+    queryset = MasterTimetableEntry.objects.all()
+    serializer_class = MasterTimetableEntrySerializer
+    permission_classes = [AllowAny]
 
-    if not can_manage_timetable(request.user, classroom_id):
-        messages.error(request, "Access denied.")
-        return redirect("teachers:dashboard")
+    def get_queryset(self):
+        qs = super().get_queryset()
+        classroom_id = self.request.query_params.get('classroom_id')
+        academic_year = self.request.query_params.get('academic_year')
+        if classroom_id:
+            qs = qs.filter(classroom_id=classroom_id)
+        if academic_year:
+            qs = qs.filter(academic_year=academic_year)
+        return qs
 
-    setting, _ = TimetableSetting.objects.get_or_create(
-        school=request.user.school,
-        classroom=classroom,
-        defaults={
-            "days": [
-                "monday",
-                "tuesday",
-                "wednesday",
-                "thursday",
-                "friday",
-            ]
-        }
-    )
-
-    assignments = TeacherSubjectAssignment.objects.filter(
-        classroom=classroom
-    ).select_related("subject", "teacher__user")
-
-    if request.method == "POST":
-        for a in assignments:
-            count = int(request.POST.get(f"subject_{a.subject.id}", 4))
-
-            SubjectRule.objects.update_or_create(
-                setting=setting,
-                subject=a.subject,
-                defaults={"weekly_lessons": count}
-            )
-
-        messages.success(request, "Saved successfully.")
-        return redirect("timetable:view", classroom_id=classroom.id)
-
-    existing = {
-        x.subject_id: x.weekly_lessons
-        for x in setting.subject_rules.all()
-    }
-
-    return render(request, "timetable/setup.html", {
-        "classroom": classroom,
-        "setting": setting,
-        "assignments": assignments,
-        "existing": existing,
-    })
+    def perform_create(self, serializer):
+        school_id = self.request.data.get('school')
+        if school_id:
+            serializer.save(school_id=school_id)
+        else:
+            classroom_id = self.request.data.get('classroom')
+            if classroom_id:
+                try:
+                    classroom = Classroom.objects.select_related(
+                        'class_grade__school'
+                    ).get(id=classroom_id)
+                    serializer.save(school=classroom.class_grade.school)
+                except Classroom.DoesNotExist:
+                    serializer.save()
+            else:
+                serializer.save()
 
 
-# ------------------------------------------------
-# View Timetable
-# ------------------------------------------------
-@login_required
-def view_timetable(request, classroom_id):
-    classroom = get_object_or_404(Classroom, pk=classroom_id)
+class ClassroomTimetableViewSet(viewsets.ModelViewSet):
+    queryset = ClassroomTimetable.objects.all()
+    serializer_class = ClassroomTimetableSerializer
+    permission_classes = [AllowAny]
 
-    entries = TimetableEntry.objects.filter(
-        classroom=classroom
-    ).select_related("subject", "teacher__user")
+    def get_queryset(self):
+        qs = super().get_queryset()
+        classroom_id = self.request.query_params.get('classroom_id')
+        academic_year = self.request.query_params.get('academic_year')
+        if classroom_id:
+            qs = qs.filter(classroom_id=classroom_id)
+        if academic_year:
+            qs = qs.filter(academic_year=academic_year)
+        return qs
 
-    return render(request, "timetable/view.html", {
-        "classroom": classroom,
-        "entries": entries,
-    })
 
-@login_required
-def timetable_list(request):
-    classrooms = Classroom.objects.filter(
-        school=request.user.school
-    )
+class ClassroomTimetableEntryViewSet(viewsets.ModelViewSet):
+    queryset = ClassroomTimetableEntry.objects.all()
+    serializer_class = ClassroomTimetableEntrySerializer
+    permission_classes = [AllowAny]
 
-    return render(request, "timetable/list.html", {
-        "classrooms": classrooms
-    })
-# ------------------------------------------------
-# Teacher Workload
-# ------------------------------------------------
-@login_required
-def teacher_workload(request):
-    teacher = get_object_or_404(
-        TeacherProfile,
-        user=request.user
-    )
+    def get_queryset(self):
+        qs = super().get_queryset()
+        timetable_id = self.request.query_params.get('timetable_id')
+        if timetable_id:
+            qs = qs.filter(timetable_id=timetable_id)
+        return qs
 
-    entries = TimetableEntry.objects.filter(
-        teacher=teacher
-    ).select_related(
-        "classroom__class_grade",
-        "classroom__section",
-        "subject"
-    )
 
-    return render(request, "timetable/teacher_workload.html", {
-        "entries": entries,
-        "teacher": teacher,
-    })
-@login_required
-def generate_timetable(request, classroom_id):
-    classroom = get_object_or_404(Classroom, pk=classroom_id)
+class PeriodViewSet(viewsets.ModelViewSet):
+    queryset = Period.objects.all()
+    serializer_class = PeriodSerializer
+    permission_classes = [AllowAny]
 
-    if not can_manage_timetable(request.user, classroom_id):
-        messages.error(request, "Access denied.")
-        return redirect("teachers:dashboard")
+    def get_queryset(self):
+        qs = super().get_queryset()
+        school_id = self.request.query_params.get('school_id')
+        if school_id:
+            qs = qs.filter(school_id=school_id)
+        return qs
 
-    setting = get_object_or_404(
-        TimetableSetting,
-        classroom=classroom
-    )
+    def perform_create(self, serializer):
+        school_id = self.request.data.get('school')
+        if school_id:
+            serializer.save(school_id=school_id)
+        else:
+            serializer.save(school=None)
 
-    TimetableEntry.objects.filter(
-        classroom=classroom
-    ).delete()
 
-    start_dt = datetime.combine(date.today(), setting.start_time)
-    end_dt = datetime.combine(date.today(), setting.end_time)
+class TimetableGenerationConfigViewSet(viewsets.ModelViewSet):
+    queryset = TimetableGenerationConfig.objects.all()
+    serializer_class = TimetableGenerationConfigSerializer
+    permission_classes = [AllowAny]
 
-    slot_minutes = setting.lesson_minutes
-    days = setting.days
+    def get_queryset(self):
+        qs = super().get_queryset()
+        school_id = self.request.query_params.get('school_id')
+        academic_year = self.request.query_params.get('academic_year')
+        if school_id:
+            qs = qs.filter(school_id=school_id)
+        if academic_year:
+            qs = qs.filter(academic_year=academic_year)
+        return qs
 
-    # build daily time slots
-    slots = []
-    current = start_dt
+    def perform_create(self, serializer):
+        school_id = self.request.data.get('school')
+        if school_id:
+            serializer.save(school_id=school_id)
+        else:
+            serializer.save()
 
-    while current + timedelta(minutes=slot_minutes) <= end_dt:
-        nxt = current + timedelta(minutes=slot_minutes)
-        slots.append((current.time(), nxt.time()))
-        current = nxt
 
-    rules = list(setting.subject_rules.all().select_related("subject"))
+class GenerationBreakViewSet(viewsets.ModelViewSet):
+    queryset = GenerationBreak.objects.all()
+    serializer_class = GenerationBreakSerializer
+    permission_classes = [AllowAny]
 
-    if not rules:
-        messages.error(request, "Please setup subjects first.")
-        return redirect("timetable:setup", classroom_id=classroom.id)
+    def get_queryset(self):
+        qs = super().get_queryset()
+        config_id = self.request.query_params.get('config_id')
+        if config_id:
+            qs = qs.filter(config_id=config_id)
+        return qs
 
-    # Expand subjects by weekly count
-    lesson_pool = []
-    for r in rules:
-        for i in range(r.weekly_lessons):
-            lesson_pool.append(r.subject)
 
-    # Spread evenly
-    day_index = 0
-    slot_index = 0
+class ClassroomSubjectConfigViewSet(viewsets.ModelViewSet):
+    queryset = ClassroomSubjectConfig.objects.all()
+    serializer_class = ClassroomSubjectConfigSerializer
+    permission_classes = [AllowAny]
 
-    for subject in lesson_pool:
-        assigned = TeacherSubjectAssignment.objects.filter(
-            classroom=classroom,
-            subject=subject
-        ).select_related("teacher").first()
+    def get_queryset(self):
+        qs = super().get_queryset()
+        config_id = self.request.query_params.get('config_id')
+        classroom_id = self.request.query_params.get('classroom_id')
+        if config_id:
+            qs = qs.filter(config_id=config_id)
+        if classroom_id:
+            qs = qs.filter(classroom_id=classroom_id)
+        return qs
 
-        teacher = assigned.teacher if assigned else None
 
-        if day_index >= len(days):
-            day_index = 0
-            slot_index += 1
+class TimetableGenerationJobViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = TimetableGenerationJob.objects.all()
+    serializer_class = TimetableGenerationJobSerializer
+    permission_classes = [AllowAny]
 
-        if slot_index >= len(slots):
-            break
+    def get_queryset(self):
+        qs = super().get_queryset()
+        school_id = self.request.query_params.get('school_id')
+        if school_id:
+            qs = qs.filter(school_id=school_id)
+        return qs.order_by('-started_at')
 
-        start_time, end_time = slots[slot_index]
 
-        TimetableEntry.objects.create(
-            setting=setting,
-            classroom=classroom,
-            subject=subject,
-            teacher=teacher,
-            day=days[day_index],
-            start_time=start_time,
-            end_time=end_time,
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication])
+@permission_classes([AllowAny])
+def available_slots(request):
+    classroom_id = request.query_params.get('classroom_id')
+    academic_year = request.query_params.get('academic_year', '2025-2026')
+
+    if not classroom_id:
+        return Response({'error': 'classroom_id is required'}, status=400)
+
+    entries = MasterTimetableEntry.objects.filter(
+        classroom_id=classroom_id,
+        academic_year=academic_year,
+    ).select_related('teacher', 'subject', 'classroom', 'room')
+
+    serializer = MasterTimetableEntrySerializer(entries, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication])
+@permission_classes([AllowAny])
+def trigger_generation(request):
+    from .tasks import generate_master_timetable
+    from schools.models import School
+
+    school_id = request.data.get('school_id')
+    academic_year = request.data.get('academic_year', '2025-2026')
+
+    if not school_id:
+        return Response({'error': 'school_id is required'}, status=400)
+
+    try:
+        school = School.objects.get(id=school_id)
+    except School.DoesNotExist:
+        return Response({'error': 'School not found'}, status=404)
+
+    try:
+        TimetableGenerationConfig.objects.get(
+            school=school,
+            academic_year=academic_year
+        )
+    except TimetableGenerationConfig.DoesNotExist:
+        return Response(
+            {'error': 'No generation config found. Please set up the timetable configuration first.'},
+            status=400
         )
 
-        day_index += 1
+    job = TimetableGenerationJob.objects.create(
+        school=school,
+        academic_year=academic_year,
+        status='pending',
+    )
 
-    messages.success(request, "Timetable generated successfully.")
-    return redirect("timetable:view", classroom_id=classroom.id)
+    task = generate_master_timetable.delay(job.id)
+    job.task_id = task.id
+    job.save()
+
+    return Response({
+        'job_id': job.id,
+        'task_id': task.id,
+        'status': 'pending',
+        'message': 'Timetable generation started in the background.',
+    })
