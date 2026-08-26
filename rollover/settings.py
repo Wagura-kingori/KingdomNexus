@@ -40,6 +40,11 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
 CELERY_RESULT_SERIALIZER = "json"
+
+# Student event sync (fees-service) 
+STUDENT_EVENTS_REDIS_URL = CELERY_BROKER_URL 
+STUDENT_EVENTS_STREAM_KEY = "kingdomnexus:student-events" 
+CURRENT_TERM = "T2-2025"
 # APPLICATIONS
 INSTALLED_APPS = [
     'rest_framework',
@@ -78,7 +83,8 @@ INSTALLED_APPS = [
     'timetable',
     'accounts',
     'schools',
-    'profiles'
+    'profiles',
+    'student_sync'
 ]
 
 AUTH_USER_MODEL = 'users.User'

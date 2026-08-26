@@ -14,7 +14,7 @@ class SectionAdmin(admin.ModelAdmin):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'current_class', 'current_section']
+    list_display = ['first_name', 'last_name', 'current_class']
 
 @admin.register(ParentProfile)
 class ParentProfileAdmin(admin.ModelAdmin):

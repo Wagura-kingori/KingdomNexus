@@ -232,31 +232,51 @@ class AddStudentForm(ModelForm):
 
         if commit:
             user.save()
-            sections       = self.cleaned_data.get("current_section")
-            chosen_section = sections.first() if sections else None
+            sections = self.cleaned_data.get("current_section")
 
-            Student.objects.update_or_create(
+            student, _ = Student.objects.update_or_create(
                 user=user,
-                defaults=dict(
-                    school=self.school,
-                    first_name=user.first_name,
-                    last_name=user.last_name,
-                    gender=self.cleaned_data.get("gender", ""),
-                    is_boarder=self.cleaned_data.get("is_boarder", "no"),
-                    current_class=self.cleaned_data.get("current_class"),
-                    current_section=chosen_section,
-                    admission_no=adm_no,
-                )
+                defaults={
+                    "school": self.school,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "gender": self.cleaned_data.get("gender", ""),
+                    "is_boarder": self.cleaned_data.get("is_boarder", "no"),
+                    "current_class": self.cleaned_data.get("current_class"),
+                    "admission_no": adm_no,
+                }
             )
+
+            student.current_section.set(sections or [])
 
             try:
                 from profiles.models import StudentProfile
-                sp, _ = StudentProfile.objects.get_or_create(user=user)
-                sp.admission_number = adm_no
-                sp.save(update_fields=["admission_number"])
-            except Exception as e:
-                logger.error("StudentProfile update failed for %s: %s", user.pk, e)
 
+                current_class = self.cleaned_data.get("current_class")
+                sections = self.cleaned_data.get("current_section")
+                chosen_section = sections.first() if sections else None
+
+                if current_class and chosen_section:
+                     classroom = f"{current_class} - {chosen_section}"
+                elif current_class:
+                    classroom = str(current_class)
+                else:
+                    classroom = ""
+
+                StudentProfile.objects.update_or_create(
+                    user=user,
+                    defaults={
+                    "admission_number": adm_no,
+                    "classroom": classroom,
+                     }
+                    )
+
+            except Exception as e:
+                    logger.error(
+                    "StudentProfile update failed for %s: %s",
+                    user.pk,e)
+                            
+                             
             if user.email:
                 send_mail(
                     subject="Your Student Account Has Been Created",

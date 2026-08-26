@@ -3,11 +3,13 @@ from . import views
 from .views import RoleBasedLoginView
 
 from .views import current_user_api
+from .views import fees_service_token
 
 
 app_name = "users"
 urlpatterns = [
     path('api/me/', current_user_api, name='current-user'),
+    path('api/fees-token/', fees_service_token, name='fees_service_token'),
     # path('login/', views.login_view, name='login'),
     path("login/", RoleBasedLoginView.as_view(), name="login"),
     path("admin_dashboard/", views.admin_dashboard, name="admin_dashboard"),
@@ -24,6 +26,9 @@ urlpatterns = [
     name="add_school_admin"),
     path("add/<int:school_id>/<str:role>/", views.add_user, name="add_user"),
     path('users/<int:user_id>/class-teacher/', views.user_class_teacher_ajax, name='user_class_teacher_ajax'),
+    path('api/csrf/', views.api_csrf, name='api_csrf'),
+    path('api/login/', views.api_login, name='api_login'),
+    path('users/<int:user_id>/withdraw/', views.student_withdraw_ajax, name='student_withdraw_ajax'),
 
 
     # path('dashboard/student/', views.student_dashboard, name='student_dashboard'),

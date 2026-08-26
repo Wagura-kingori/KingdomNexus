@@ -5,7 +5,7 @@ from django.utils.crypto import get_random_string
 
 from .models import (
     TeacherProfile,
-    StudentProfile,
+    
     ParentProfile,
     PayrollProfile,
 )
@@ -39,11 +39,7 @@ def create_user_profile(sender, instance, created, **kwargs):
             )
 
     elif instance.role == "student":
-        if school:
-            StudentProfile.objects.get_or_create(
-                user=instance,
-                defaults={"school": school}
-            )
+        pass
 
     elif instance.role == "parent":
         ParentProfile.objects.get_or_create(user=instance)

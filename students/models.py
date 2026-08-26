@@ -75,6 +75,11 @@ class Student(models.Model):
         ("yes", "Boarder"),
         ("no",  "Day Scholar"),
     ]
+    STATUS_CHOICES = [
+        ("active", "Active"),
+        ("withdrawn", "Withdrawn"),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -102,13 +107,12 @@ class Student(models.Model):
         blank=True,
         related_name="current_students"
     )
-    current_section = models.ForeignKey(
-        "students.Section",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="current_students"
-    )
+    current_section = models.ManyToManyField(
+            Section,
+            blank=True,
+            related_name="students"
+                )
+   
 
     parents = models.ManyToManyField(
         "profiles.ParentProfile",

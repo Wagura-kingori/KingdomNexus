@@ -14,9 +14,12 @@ class User(AbstractUser):
         ('parent', 'Parent'),
         ('payroll', 'Payroll Manager'),
         ('staff', 'Staff'),
+        ('bursar', 'Bursar'),
     ]
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    STATUS_CHOICES = [ ("active", "Active"), ("withdrawn", "Withdrawn"), ] 
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active") 
 
     school = models.ForeignKey(
         "schools.School",

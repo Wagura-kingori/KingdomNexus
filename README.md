@@ -1,16 +1,19 @@
 # KingdomNexus
 
-A comprehensive multi-tenant school management system built with Django, featuring role-based access control, a REST API consumed by a Next.js frontend, and Celery-powered async timetable generation.
+A comprehensive multi-tenant school management system built with Django and springboot featuring role-based access control, a REST API consumed by a Next.js frontend, and Celery-powered async timetable generation.
 
-> **Django project package:** `rollover` | **Frontend:** [timetablesetup](../timetablesetup/README.md)
+> **Django project package:** `rollover` | **Fees frontend:** [school-fees-management](../school-fees-management/README.md) | **Fees backend:** [fees-service](../fees-service/README.md) (Spring Boot)
 
 ---
 
 ## 🚀 Features
 
 - **Multi-school / Multi-tenant** — Superadmin manages multiple schools; each school operates independently
-- **Role-based Access Control** — Superadmin, School Admin, Teacher, Student, and Parent roles with scoped permissions
-- **Django REST Framework API** — Consumed by the Next.js 15 frontend (JWT-authenticated)
+- **Role-based Access Control** — Superadmin, School Admin, Teacher, Student, Parent, Payroll Manager, and Bursar roles with scoped permissions
+- **Django REST Framework API** — Consumed by the Next.js 15 timetable frontend (JWT-authenticated)
+- **Session-to-JWT bridge** — `/api/fees-token/` lets an already-logged-in (session-based) user obtain a short-lived JWT for calling independent microservices (currently: fees-service),(payrol: coming soon)
+- **AJAX login endpoints** (`/api/csrf/`, `/api/login/`) — used by the fees dashboard's in-app login modal, no page navigation required
+- **Event-driven sync to fees-service** — the `student_sync` app publishes student lifecycle events (enrolled/updated/withdrawn, term started) over Redis Streams, keeping the Spring Boot fees-service's local student data current without a synchronous call between services
 - **Celery + Redis Async Tasks** — Automated timetable generation running as background tasks
 - **WeasyPrint PDF Generation** — Report cards, payslips, and fee statements rendered to PDF
 - **Force Password Change Middleware** — First-login password change enforcement
@@ -24,7 +27,7 @@ A comprehensive multi-tenant school management system built with Django, featuri
 
 - Python 3.13+
 - PostgreSQL (or SQLite for development)
-- Redis / [Memurai](https://www.memurai.com/) (Windows) for Celery broker
+- Redis / [Memurai](https://www.memurai.com/) (Windows) for Celery broker **and** student_sync event publishing
 - WeasyPrint (for PDF generation)
 
 ### Setup
@@ -60,8 +63,9 @@ A comprehensive multi-tenant school management system built with Django, featuri
    CELERY_BROKER_URL=redis://localhost:6379/0
    CELERY_RESULT_BACKEND=redis://localhost:6379/0
 
-   # CORS (Next.js frontend)
+   # CORS (Next.js frontends — timetable + fees dashboard)
    CORS_ALLOWED_ORIGINS=http://localhost:4028
+   CSRF_TRUSTED_ORIGINS=http://localhost:4028
    ```
 
 4. **Run migrations:**
@@ -89,13 +93,19 @@ A comprehensive multi-tenant school management system built with Django, featuri
    celery -A rollover worker --loglevel=info
    ```
 
+9. **(Optional) Start fees-service** — see [fees-service/README.md](../fees-service/README.md).
+   Django works fine without it running; only the fees dashboard needs
+   it. Set `FEES_EVENTS_ENABLED=true` there once ready to receive
+   student sync events from this project.
+
 ---
 
 ## 🧩 Apps Overview
 ## some apps are still in development 
 | App | Purpose |
 |---|---|
-| `users` | Custom user model, role management, middleware, force-password-change flow |
+| `users` | Custom user model, role management, middleware, force-password-change flow, session-to-JWT bridge endpoints |
+| `student_sync` | Publishes student lifecycle events (Redis Streams) consumed by the separate `fees-service` microservice — does not affect this app's own behavior if Redis is down |
 | `profiles` | Auto-created profiles for Teachers, Students, and Parents via signals |
 | `schools` | School registration and school-level dashboard |
 | `academics` | Subjects, classrooms, class grades, sections, and enrollments |
@@ -104,9 +114,9 @@ A comprehensive multi-tenant school management system built with Django, featuri
 | `timetable` | Timetable entries, periods, breaks, generation config, Celery tasks, solver engine |
 | `attendance` | Attendance records with serializers for API consumption |
 | `exams` | Exam types, exams, and student results with class ranking |
-| `fees` | Fee structures, payments, and student fee statements |
+| `fees` | Django-native fee structures/payments (legacy — being superseded by the separate `fees-service` Spring Boot microservice for the bursar-facing dashboard; not the same thing) |
 | `grading` | Grade boundaries and grading scale configuration |
-| `payroll` | Staff payroll, payslip generation, payroll periods, and PDF payslips |
+| `payroll` | Staff payroll, payslip generation, payroll periods, and PDF payslips (a Spring Boot `payroll-service`, following the same pattern as `fees-service`, is planned) |
 | `reports` | Report cards and PDF report generation (WeasyPrint) |
 | `messaging` | Internal notices and messages between users |
 | `library` | Book catalog, borrowing, fines, and overdue management |
@@ -137,7 +147,8 @@ rollover/                          # Root directory
 │   ├── asgi.py
 │   └── wsgi.py
 │
-├── users/                         # Custom user model + RBAC
+├── users/                         # Custom user model + RBAC + JWT bridge + AJAX login
+├── student_sync/                  # Publishes student events to fees-service via Redis Streams
 ├── profiles/                      # Auto-created role profiles (signals)
 ├── schools/                       # Multi-school management
 ├── academics/                     # Subjects, classrooms, enrollments
@@ -149,7 +160,7 @@ rollover/                          # Root directory
 │   └── serializers.py             # DRF serializers for API
 ├── attendance/                    # Attendance tracking
 ├── exams/                         # Exams, results, class rankings
-├── fees/                          # Fee structures and payments
+├── fees/                          # Django-native fees app (legacy, see fees-service)
 ├── grading/                       # Grading scale configuration
 ├── payroll/                       # Staff payroll and payslips
 ├── reports/                       # Report cards (WeasyPrint PDF)
@@ -190,8 +201,8 @@ rollover/                          # Root directory
 
 Authentication is dual-mode:
 
-- **Session auth** — Django templates (admin dashboard, teacher/student/parent portals)
-- **JWT auth** — DRF API consumed by the Next.js frontend (`djangorestframework-simplejwt`)
+- **Session auth** — Django templates (admin dashboard, teacher/student/parent portals). Login is handled by `RoleBasedLoginView`, which routes each role to its destination via a shared `role_redirect_url()` function — also used by `force_password_change` after a first-login password reset, so a newly created user lands in the right place immediately rather than a generic home page.
+- **JWT auth** — DRF API consumed by Next.js frontends (`djangorestframework-simplejwt`). No dedicated JWT login endpoint exists for end users; instead, `GET /api/fees-token/` bridges an existing Django session into a short-lived JWT on demand, carrying the user's `role` as a token claim. `POST /api/login/` (paired with `GET /api/csrf/`) additionally supports logging into Django itself via AJAX, from a separate frontend, without a page navigation.
 
 ### Roles
 
@@ -202,8 +213,21 @@ Authentication is dual-mode:
 | Teacher | Accesses own subjects, classes, attendance, and results entry |
 | Student | Views own timetable, results, fees, and attendance |
 | Parent | Views children's results, attendance, fees, and notices |
+| Payroll Manager | Manages staff payroll |
+| Bursar | Manages school fees via the separate fees-service dashboard |
 
 > First-time login forces a password change via the `users` middleware before any other page is accessible.
+
+### Withdrawal (not deletion)
+
+`User.status` (`active` / `withdrawn`) tracks whether someone is still
+active in the system, separate from whether their account still
+exists. Withdrawing someone (any role) sets this flag, deactivates
+their login (`is_active = False`), and — for students specifically —
+publishes a `student.withdrawn` event so fees-service marks them
+accordingly without ever touching their payment history. This is
+intentionally distinct from actually deleting a `User`, which remains
+permanent and irreversible.
 
 ---
 
@@ -280,7 +304,8 @@ python manage.py collectstatic
 
 ## 🔗 Related
 
-- [timetablesetup (Next.js frontend)](../timetablesetup/README.md)
+- [school-fees-management (Next.js fees dashboard)](../school-fees-management/README.md)
+- [fees-service (Spring Boot fees backend)](../fees-service/README.md)
 - [Django REST Framework](https://www.django-rest-framework.org/)
 - [Celery Docs](https://docs.celeryq.dev/)
 - [Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/)

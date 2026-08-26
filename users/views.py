@@ -6,9 +6,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.forms import modelformset_factory
-from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-import json
+
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
@@ -23,9 +22,38 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import AllowAny
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken 
 
+from django.contrib.auth import authenticate, login as django_login
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
+import json
 
+##Withdrawing Student from the system
+@login_required
+@require_POST
+def student_withdraw_ajax(request, user_id):
+    user = get_object_or_404(User, id=user_id)
 
+    if not request.user.is_superadmin() and request.user.school != user.school:
+        return JsonResponse({"success": False, "error": "Access denied."}, status=403)
+
+    if user.role != "student" or not hasattr(user, "student_account"):
+        return JsonResponse({"success": False, "error": "Not a student."}, status=400)
+
+    student = user.student_account
+    student.status = "withdrawn"
+    student.save(update_fields=["status"])
+
+    user.is_active = False
+    user.save(update_fields=["is_active"])
+
+    from datetime import date
+    from student_sync import publisher
+    publisher.student_withdrawn(student.admission_no, withdrawn_on=date.today())
+
+    name = f"{user.first_name} {user.last_name}".strip() or user.username
+    return JsonResponse({"success": True, "name": name})
 # -----------------------------
 # ADD USERS (FORMSET)
 # -----------------------------
@@ -38,6 +66,9 @@ def add_user(request, school_id, role):
         return redirect("home")
 
     users_qs = User.objects.filter(school=school, role=role).order_by("-id")
+
+    if role == "student":
+        users_qs = users_qs.filter(student_account__status="active")
 
     if role == "teacher":
         users_qs = users_qs.prefetch_related("teacher_profile__subjects")
@@ -65,20 +96,15 @@ def add_user(request, school_id, role):
         grades_list = list(
             ClassGrade.objects.filter(school=school).values("id", "name")
         )
-        # Build sections keyed by grade id for the JS dynamic filter
         sections_by_grade = {}
         for sec in Section.objects.filter(school=school).select_related("class_grade"):
             gid = str(sec.class_grade_id)
             sections_by_grade.setdefault(gid, []).append(
                 {"id": sec.id, "name": sec.name}
             )
-        # Serialize to JSON strings 
-        extra_ctx["grades_json"]           = json.dumps(grades_list)
+        extra_ctx["grades_json"] = json.dumps(grades_list)
         extra_ctx["sections_by_grade_json"] = json.dumps(sections_by_grade)
 
-    # For teacher role — build classroom list from grades+sections.
-    # section_id is NOT NULL in the DB so we only create Classroom rows
-    # for grade+section pairs — grades with no sections are skipped.
     if role == "teacher":
         existing_cls = {
             (c.class_grade_id, c.section_id): c
@@ -96,7 +122,6 @@ def add_user(request, school_id, role):
             for section in grade.sections.all().order_by("name"):
                 key = (grade.pk, section.pk)
                 if key not in existing_cls:
-                    # Auto-create the Classroom row so it can be assigned
                     obj, _ = Classroom.objects.get_or_create(
                         class_grade=grade,
                         section=section,
@@ -105,10 +130,10 @@ def add_user(request, school_id, role):
                     existing_cls[key] = obj
                 c = existing_cls[key]
                 classrooms_list.append({
-                    "id":         c.pk,
-                    "grade":      grade.name,
-                    "section":    section.name,
-                    "label":      f"{grade.name} \u2014 {section.name}",
+                    "id": c.pk,
+                    "grade": grade.name,
+                    "section": section.name,
+                    "label": f"{grade.name} — {section.name}",
                     "teacher_id": c.class_teacher_id,
                 })
         extra_ctx["classrooms_json"] = json.dumps(classrooms_list)
@@ -131,10 +156,8 @@ def add_user(request, school_id, role):
                 )
                 if not has_data:
                     continue
-              
                 if form.errors:
                     continue
-                # Never save without a username
                 if not form.cleaned_data.get('username'):
                     continue
                 form.save()
@@ -153,14 +176,12 @@ def add_user(request, school_id, role):
         )
 
     return render(request, "users/add_user.html", {
-        "school":  school,
-        "role":    role,
-        "users":   users,
+        "school": school,
+        "role": role,
+        "users": users,
         "formset": formset,
         **extra_ctx,
     })
-
-
 # -----------------------------
 # AJAX UPDATE USER
 # -----------------------------
@@ -322,10 +343,33 @@ def save_class_teacher(request, user_id):
         "is_class_teacher": bool(classroom_ids),
         "classroom_ids": classroom_ids,
     })
-
+def fees_service_token(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"detail": "Not authenticated"}, status=401) 
+    refresh = RefreshToken.for_user(request.user)
+    refresh['role'] = request.user.role
+    access = refresh.access_token
+    return JsonResponse({"access": str(access), "exp": access['exp']})
 # -----------------------------
 # LOGIN VIEW
 # -----------------------------
+
+def role_redirect_url(user): 
+    if user.role == "superadmin":
+        return "/dashboard/super/" 
+    if not user.school: 
+        return "/no-school-assigned/" 
+    if user.role == "admin":
+        return f"/schools/{user.school.id}/dashboard/" 
+    if user.role == "teacher": 
+        return reverse("teachers:dashboard") 
+    if user.role == "payroll":
+        return f"/schools/{user.school.id}/payroll/dashboard/"
+    if user.role == "parent":
+        return "/parent/dashboard/" 
+    if user.role == "bursar":
+         return "http://localhost:4028"
+    return "/"
 class RoleBasedLoginView(LoginView):
     template_name = "users/login.html"
 
@@ -342,22 +386,10 @@ class RoleBasedLoginView(LoginView):
     def get_success_url(self):
         return self._role_url(self.request.user)
 
-    def _role_url(self, user):
+    def _role_url(self, user): 
         if user.must_change_password:
-            return reverse("users:force_password_change")
-        if user.role == "superadmin":
-            return "/dashboard/super/"
-        if not user.school:
-            return "/no-school-assigned/"
-        if user.role == "admin":
-            return f"/schools/{user.school.id}/dashboard/"
-        if user.role == "teacher":
-            return reverse("teachers:dashboard")
-        if user.role == "payroll":
-            return f"/schools/{user.school.id}/payroll/dashboard/"
-        if user.role == "parent":
-            return "/parent/dashboard/"
-        return "/"
+             return reverse("users:force_password_change")
+        return role_redirect_url(user)
 
 
 # -----------------------------
@@ -394,7 +426,7 @@ def payroll_manager_dashboard(request):
 @login_required
 def force_password_change(request):
     if not request.user.must_change_password:
-        return redirect("home")
+        return redirect(role_redirect_url(user))
 
     if request.method == "POST":
         form = PasswordChangeForm(request.user, request.POST)
@@ -404,7 +436,7 @@ def force_password_change(request):
             user.must_change_password = False
             user.save()
             messages.success(request, "Password changed successfully.")
-            return redirect("home")
+            return redirect(role_redirect_url(user))
     else:
         form = PasswordChangeForm(request.user)
 
@@ -451,3 +483,30 @@ def current_user_api(request):
         }
 
     return Response(data)
+
+
+
+def api_csrf(request):
+    return JsonResponse({"csrfToken": get_token(request)})
+
+
+def api_login(request):
+    if request.method != "POST":
+        return JsonResponse({"detail": "Method not allowed"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"detail": "Invalid JSON"}, status=400)
+
+    user = authenticate(
+        request,
+        username=data.get("username"),
+        password=data.get("password"),
+    )
+
+    if user is None:
+        return JsonResponse({"detail": "Invalid username or password"}, status=401)
+
+    django_login(request, user)
+    return JsonResponse({"detail": "Logged in", "role": user.role})
